@@ -554,5 +554,56 @@
     document.getElementById('fText').addEventListener('input', renderList);
     document.getElementById('doSearch').addEventListener('click', (e)=>{ e.preventDefault(); renderList(); });
   </script>
+  <!-- Admin tools dialog -->
+<dialog id="adminDlg">
+  <form method="dialog">
+    <h3 style="margin:0 0 10px;">Admin tools</h3>
+    <label>EntryID to delete</label>
+    <input type="text" id="adminDeleteId" placeholder="Paste the EntryID (e.g., 2025-09-12T10:23:45Z)">
+    <label>Admin PIN</label>
+    <input type="password" id="adminPin" placeholder="Enter admin PIN">
+    <div style="text-align:right; margin-top:10px;">
+      <button value="cancel" class="btn">Close</button>
+      <button id="adminDeleteBtn" value="default" class="btn primary">🗑 Delete</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+  // Add Admin button next to the settings cog
+  (function addAdminButton(){
+    const topbar = document.querySelector('.topbar');
+    const btn = document.createElement('button');
+    btn.className = 'btn ghost';
+    btn.textContent = 'Admin';
+    btn.style.marginLeft = '8px';
+    btn.onclick = () => document.getElementById('adminDlg').showModal();
+    topbar.appendChild(btn);
+  })();
+
+  document.getElementById('adminDeleteBtn').addEventListener('click', async (e)=>{
+    e.preventDefault();
+    const id = document.getElementById('adminDeleteId').value.trim();
+    const pin = document.getElementById('adminPin').value.trim();
+    if (!id || !pin) { alert('Please enter EntryID and Admin PIN.'); return; }
+
+    // Use the same token as the app (or force your known token here)
+    const token = (localStorage.getItem('jm:cfg:token') || 'JMvSource_92nF7x!qA4pLz#Xt8Kd').trim();
+
+    try {
+      const res = await fetch('/.netlify/functions/gsheets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action:'delete', id, adminPin: pin, token })
+      });
+      const j = await res.json().catch(()=>({ ok:false, error:'Invalid JSON' }));
+      if (!j.ok) throw new Error(j.error || 'Delete failed');
+      alert(`Deleted ${j.deleted || 0} row(s) from ${j.sheetName || 'Responses'}.`);
+      document.getElementById('adminDlg').close();
+    } catch (err) {
+      alert('Delete error: ' + (err.message || err));
+    }
+  });
+</script>
 </body>
 </html>
