@@ -1,5 +1,4 @@
-// service-worker.js
-const CACHE_NAME = 'jm-sourcing-full-v15';
+const CACHE_NAME = 'jm-sourcing-full-v16';
 const ASSETS = [
   './',
   './index.html',
