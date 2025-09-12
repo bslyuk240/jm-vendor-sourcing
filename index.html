@@ -72,18 +72,140 @@
       <div id="tabRecords" class="tab">My Records</div>
     </div>
 
-    <!-- === Form goes here (unchanged) === -->
-    <div id="viewForm">…</div>
+    <!-- === FORM === -->
+    <div id="viewForm">
+      <div class="grid2">
+        <div>
+          <label>Marketer's Name *</label>
+          <input type="text" id="marketerName" required>
+        </div>
+        <div>
+          <label>Marketer's Phone *</label>
+          <input type="tel" id="marketerPhone" required>
+        </div>
+      </div>
+      <label>Marketer Email (optional)</label>
+      <input type="email" id="marketerEmail">
 
-    <!-- === Records view (unchanged) === -->
-    <div id="viewRecords" class="hidden">…</div>
+      <hr class="sep">
+
+      <label>Vendor/Business Name *</label>
+      <input type="text" id="vendorName" required>
+
+      <div class="grid2">
+        <div>
+          <label>Contact Person Name *</label>
+          <input type="text" id="contactPerson" required>
+        </div>
+        <div>
+          <label>Vendor Phone Number *</label>
+          <input type="tel" id="vendorPhone" required>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label>Vendor Email Address *</label>
+          <input type="email" id="vendorEmail" required>
+        </div>
+        <div>
+          <label>Business Address / Location *</label>
+          <input type="text" id="businessAddress" required>
+        </div>
+      </div>
+
+      <hr class="sep">
+
+      <div class="grid3">
+        <div>
+          <label>Type of Business / Product Category *</label>
+          <select id="category" required>
+            <option value="">Select…</option>
+            <option>Fashion</option>
+            <option>Electronics</option>
+            <option>Groceries</option>
+            <option>Home and Living</option>
+            <option>Beauty/Cosmetics</option>
+            <option>Accessories</option>
+            <option>Babies</option>
+            <option>Automotives</option>
+          </select>
+        </div>
+        <div>
+          <label>Does the vendor currently sell online? *</label>
+          <select id="sellsOnline" required>
+            <option value="">Select…</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+        <div>
+          <label>If Yes, where?</label>
+          <input type="text" id="whereOnline" placeholder="Instagram, Facebook, WhatsApp, Jumia, Konga, Physical shop only">
+        </div>
+      </div>
+
+      <hr class="sep">
+
+      <div class="grid3">
+        <div>
+          <label>Has the vendor shown interest in registering? *</label>
+          <select id="interest" required>
+            <option value="">Select…</option>
+            <option>Yes</option>
+            <option>No</option>
+            <option>Maybe</option>
+          </select>
+        </div>
+        <div>
+          <label>Preferred onboarding method *</label>
+          <select id="onboarding" required>
+            <option value="">Select…</option>
+            <option>Marketer Assistance</option>
+            <option>Self Registration</option>
+            <option>Needs Call Back</option>
+          </select>
+        </div>
+        <div>
+          <label>Any challenges/concerns raised by the vendor?</label>
+          <input type="text" id="challenges" placeholder="Optional">
+        </div>
+      </div>
+
+      <hr class="sep">
+
+      <label>Upload product pictures (if available)</label>
+      <input type="file" id="images" accept="image/*" multiple>
+
+      <label>Marketer Comments</label>
+      <textarea id="comments" placeholder="Anything else worth noting…"></textarea>
+
+      <div class="actions">
+        <button id="saveBtn" class="btn primary">➕ Save / Submit</button>
+        <div id="netStatus" class="status">Status: <span class="online" id="onlineTxt">Online</span></div>
+      </div>
+    </div>
+
+    <!-- === RECORDS === -->
+    <div id="viewRecords" class="hidden">
+      <div class="searchRow">
+        <input type="text" id="fText" placeholder="Search vendor, staff, comments…">
+        <button id="doSearch" class="btn searchBtn">🔎</button>
+      </div>
+      <div class="tools">
+        <button id="toggleSelect" class="btn">☑️ Select</button>
+        <button id="deleteSelected" class="btn">🗑 Delete selected</button>
+        <button id="syncNow" class="btn">⟳ Sync queued now</button>
+        <button id="exportCSV" class="btn">⬇️ Export My Records (CSV)</button>
+      </div>
+      <div id="list" class="list"></div>
+    </div>
 
     <div class="footer">
       <a href="https://docs.google.com/spreadsheets/d/1Oy5sctouREFW7Sr84LQlkaXevX-LiYKYw_TdcEH6p3A/edit#gid=0"
         target="_blank" rel="noopener" class="tiny" style="color:#ff914d;text-decoration:underline">
         Open Sheet (Admin)
       </a>
-      • Add to Home Screen on Android (⋮ → Add to Home screen) • iPhone Safari (Share → Add to Home Screen). Works offline.
     </div>
   </div>
 </div>
@@ -96,17 +218,333 @@
 <div id="toast" class="toast"></div>
 
 <script>
-// simple error catcher
+// catch errors
 window.onerror = function(msg, src, line, col){
   alert("App error: " + msg + " (" + line + ":" + col + ")");
 };
 </script>
-
 <script>
-// === Your JS logic here ===
-// Use the version I sent earlier, but replace every curly apostrophe ’ with either ' or ".
-// In particular, CSV header should be:
-// ["ID","Marketer's Name","Marketer Phone", ... ]
+// error catcher
+window.onerror = function(msg, src, line, col){ alert("App error: " + msg + " (" + line + ":" + col + ")"); };
+
+function toast(msg, ok=true){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show '+(ok?'':'err'); setTimeout(()=>{ t.className='toast'; }, 2000); }
+function setNet(){ const s=document.getElementById('onlineTxt'); if (navigator.onLine){ s.textContent='Online'; s.className='online'; } else { s.textContent='Offline'; s.className='offline'; } }
+window.addEventListener('online', setNet); window.addEventListener('offline', setNet);
+
+// CONFIG
+const cfg = {
+  get: ()=> ({
+    brand: localStorage.getItem('jm:cfg:brand') || 'JulineMart Vendor Sourcing',
+    token: localStorage.getItem('jm:cfg:token') || 'JMvSource_92nF7x!qA4pLz#Xt8Kd',
+    defMarketerName: localStorage.getItem('jm:cfg:defMarketerName') || '',
+    defMarketerPhone: localStorage.getItem('jm:cfg:defMarketerPhone') || '',
+    defMarketerEmail: localStorage.getItem('jm:cfg:defMarketerEmail') || ''
+  }),
+  set: (o)=>{ if (o.brand!==undefined) localStorage.setItem('jm:cfg:brand', o.brand);
+              if (o.token!==undefined) localStorage.setItem('jm:cfg:token', o.token);
+              if (o.defMarketerName!==undefined) localStorage.setItem('jm:cfg:defMarketerName', o.defMarketerName);
+              if (o.defMarketerPhone!==undefined) localStorage.setItem('jm:cfg:defMarketerPhone', o.defMarketerPhone);
+              if (o.defMarketerEmail!==undefined) localStorage.setItem('jm:cfg:defMarketerEmail', o.defMarketerEmail);
+              applyBrand(); }
+};
+function applyBrand(){ const c=cfg.get(); document.getElementById('brand').textContent=c.brand; document.title=c.brand; }
+
+const dataKey = id => 'jm:data:'+id;
+const queueKey = 'jm:queue';
+function idNow(){ return new Date().toISOString(); }
+
+async function filesToBase64List(input){
+  const files = Array.from(input.files || []); const out=[];
+  for (const f of files){ const buf=await f.arrayBuffer(); const b64=btoa(String.fromCharCode(...new Uint8Array(buf))); out.push({ filename:f.name, mimeType:f.type||'application/octet-stream', data:b64 }); }
+  return out;
+}
+
+function getPayload(){
+  return {
+    id: idNow(),
+    marketerName: document.getElementById('marketerName').value.trim(),
+    marketerPhone: document.getElementById('marketerPhone').value.trim(),
+    marketerEmail: document.getElementById('marketerEmail').value.trim(),
+    vendorName: document.getElementById('vendorName').value.trim(),
+    contactPerson: document.getElementById('contactPerson').value.trim(),
+    vendorPhone: document.getElementById('vendorPhone').value.trim(),
+    vendorEmail: document.getElementById('vendorEmail').value.trim(),
+    businessAddress: document.getElementById('businessAddress').value.trim(),
+    category: document.getElementById('category').value,
+    sellsOnline: document.getElementById('sellsOnline').value,
+    whereOnline: document.getElementById('whereOnline').value.trim(),
+    interest: document.getElementById('interest').value,
+    onboarding: document.getElementById('onboarding').value,
+    challenges: document.getElementById('challenges').value.trim(),
+    comments: document.getElementById('comments').value.trim(),
+    device: navigator.userAgent
+  };
+}
+
+function validate(p){
+  const required = [
+    ["Marketer's Name",            p.marketerName],
+    ["Marketer's Phone",           p.marketerPhone],
+    ["Vendor/Business Name",       p.vendorName],
+    ["Contact Person Name",        p.contactPerson],
+    ["Vendor Phone Number",        p.vendorPhone],
+    ["Vendor Email Address",       p.vendorEmail],
+    ["Business Address / Location",p.businessAddress],
+    ["Type of Business / Category",p.category],
+    ["Sells online?",              p.sellsOnline],
+    ["Interest in registering",    p.interest],
+    ["Preferred onboarding",       p.onboarding]
+  ];
+  for (const [label, val] of required) {
+    if (!val) { alert(`Please fill required field: ${label}`); return false; }
+  }
+  return true;
+}
+
+function saveLocal(p){ localStorage.setItem(dataKey(p.id), JSON.stringify(p)); }
+function allLocal(){
+  return Object.keys(localStorage).filter(k=>k.startsWith('jm:data:'))
+    .map(k=>JSON.parse(localStorage.getItem(k)||'{}'))
+    .sort((a,b)=> a.id < b.id ? 1 : -1);
+}
+function queue(item){ const q=JSON.parse(localStorage.getItem(queueKey)||'[]'); q.push(item); localStorage.setItem(queueKey, JSON.stringify(q)); }
+
+async function postViaProxy(payload, images){
+  const { token } = cfg.get();
+  const ctrl = new AbortController(); const timer = setTimeout(()=> ctrl.abort(), 20000);
+  const res = await fetch('/.netlify/functions/gsheets', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, ...payload, images }),
+    signal: ctrl.signal
+  });
+  clearTimeout(timer);
+  const j = await res.json().catch(()=>({ ok:false, error:'Invalid JSON from server' }));
+  if (!res.ok || !j.ok) throw new Error(j.error || ('HTTP '+res.status));
+  return j;
+}
+
+async function flushQueue(){
+  const q = JSON.parse(localStorage.getItem(queueKey) || '[]'); if(!q.length) return;
+  const keep = [];
+  for (const item of q){ try { await postViaProxy(item.payload, item.images||[]); } catch(e){ keep.push(item); } }
+  localStorage.setItem(queueKey, JSON.stringify(keep));
+  toast(keep.length ? ('Some items still queued: '+keep.length) : 'All queued items synced ✓', keep.length===0);
+  renderList();
+}
+window.addEventListener('online', flushQueue);
+
+function clearForm(){
+  ['vendorName','contactPerson','vendorPhone','vendorEmail','businessAddress','whereOnline','challenges','comments'].forEach(id=> document.getElementById(id).value = '');
+  ['category','sellsOnline','interest','onboarding'].forEach(id=> document.getElementById(id).value = '');
+  document.getElementById('images').value = '';
+  const c = cfg.get();
+  if (c.defMarketerName) document.getElementById('marketerName').value = c.defMarketerName;
+  if (c.defMarketerPhone) document.getElementById('marketerPhone').value = c.defMarketerPhone;
+  if (c.defMarketerEmail) document.getElementById('marketerEmail').value = c.defMarketerEmail;
+}
+
+// RECORDS with select mode + multi-delete
+let selectMode = false;
+const selectedIds = new Set();
+
+function renderList(){
+  const list = document.getElementById('list');
+  const t = (document.getElementById('fText').value || '').toLowerCase().trim();
+  const items = allLocal().filter(p=>{
+    if (!t) return true;
+    const hay = [p.marketerName,p.vendorName,p.contactPerson,p.category,p.sellsOnline,p.whereOnline,p.challenges,p.comments].join(' ').toLowerCase();
+    return hay.includes(t);
+  });
+
+  list.innerHTML = '';
+  if(!items.length){
+    const div = document.createElement('div'); div.className = 'item';
+    div.textContent = 'No records match your search.'; list.appendChild(div); return;
+  }
+  items.forEach(p=>{
+    const div = document.createElement('div'); div.className = 'item';
+    const idShort = p.id ? p.id.slice(0, 19) : '';
+    const checkbox = selectMode ? `<input type="checkbox" class="sel" data-id="${p.id}" style="margin-right:8px;">` : '';
+    div.innerHTML = `
+      <div class="row">
+        <div style="display:flex; align-items:center;">
+          ${checkbox}
+          <div>
+            <strong>${p.vendorName}</strong>
+            <div class="tiny">${p.category} • ${p.sellsOnline}${p.whereOnline? ' ('+p.whereOnline+')':''} • <span class="mono" title="${p.id}">${idShort}</span></div>
+          </div>
+        </div>
+        <div class="pill tiny">${p.interest}</div>
+      </div>
+      <div class="tiny" style="margin-top:6px;"><strong>Marketer:</strong> ${p.marketerName} • <strong>Contact:</strong> ${p.contactPerson}</div>
+    `;
+    if (!selectMode) div.addEventListener('click', ()=> showDetail(p));
+    list.appendChild(div);
+  });
+
+  if (selectMode) {
+    list.querySelectorAll('input.sel').forEach(cb=>{
+      cb.addEventListener('change', (e)=>{
+        const id = e.currentTarget.dataset.id;
+        if (e.currentTarget.checked) selectedIds.add(id); else selectedIds.delete(id);
+      });
+    });
+  }
+}
+
+function showDetail(p){
+  const b = document.getElementById('detailBody');
+  const esc = s => String(s||'').replace(/</g,'&lt;');
+  b.innerHTML = `
+    <div><strong>ID:</strong> <span class="mono">${esc(p.id)}</span></div>
+    <hr class="sep">
+    <div><strong>Marketer:</strong> ${esc(p.marketerName)} • ${esc(p.marketerPhone)} ${p.marketerEmail? '• '+esc(p.marketerEmail):''}</div>
+    <div><strong>Vendor:</strong> ${esc(p.vendorName)}</div>
+    <div><strong>Contact Person:</strong> ${esc(p.contactPerson)}</div>
+    <div><strong>Phone / Email:</strong> ${esc(p.vendorPhone)} • ${esc(p.vendorEmail)}</div>
+    <div><strong>Address:</strong> ${esc(p.businessAddress)}</div>
+    <div><strong>Category:</strong> ${esc(p.category)}</div>
+    <div><strong>Sells online:</strong> ${esc(p.sellsOnline)} ${p.whereOnline? '('+esc(p.whereOnline)+')':''}</div>
+    <div><strong>Interest:</strong> ${esc(p.interest)} • <strong>Onboarding:</strong> ${esc(p.onboarding)}</div>
+    ${p.challenges? `<div><strong>Challenges:</strong> ${esc(p.challenges)}</div>`:''}
+    ${p.comments? `<div><strong>Marketer comments:</strong> ${esc(p.comments)}</div>`:''}
+  `;
+  document.getElementById('detailDlg').showModal();
+}
+
+// Save / Submit
+document.getElementById('saveBtn').addEventListener('click', async (ev)=>{
+  const btn = ev.currentTarget;
+  const payload = getPayload();
+  if (!validate(payload)) return;
+  btn.disabled = true; const original = btn.textContent; btn.textContent = 'Saving…';
+  saveLocal(payload);
+  const images = await filesToBase64List(document.getElementById('images'));
+  try { await postViaProxy(payload, images); toast('Saved and synced ✓', true); btn.textContent = 'Saved ✓'; setTimeout(()=> btn.textContent = original, 900); }
+  catch (e){ queue({ payload, images }); console.error('Sync failed:', e); toast('Saved locally. ' + e.message, false); btn.textContent = 'Queued ⟳'; setTimeout(()=> btn.textContent = original, 1400); }
+  finally { btn.disabled = false; }
+  renderList();
+});
+
+// Records tools
+document.getElementById('exportCSV').addEventListener('click', ()=>{
+  const items = allLocal();
+  const rows = [[
+    "ID","Marketer's Name","Marketer Phone","Marketer Email","Vendor/Business Name","Contact Person Name",
+    "Vendor Phone","Vendor Email","Business Address","Category","Sells Online","Where",
+    "Interest","Onboarding","Challenges","Comments","Device"
+  ]];
+  items.forEach(p=> rows.push([p.id,p.marketerName,p.marketerPhone,p.marketerEmail,p.vendorName,p.contactPerson,p.vendorPhone,p.vendorEmail,p.businessAddress,p.category,p.sellsOnline,p.whereOnline,p.interest,p.onboarding,(p.challenges||'').replace(/\n/g,' '),(p.comments||'').replace(/\n/g,' '),p.device]));
+  const csv = rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'}); const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'jm-sourcing-records.csv'; document.body.appendChild(a); a.click(); a.remove();
+});
+
+document.getElementById('syncNow').addEventListener('click', (e)=>{ e.preventDefault(); flushQueue(); });
+document.getElementById('fText').addEventListener('input', renderList);
+document.getElementById('doSearch').addEventListener('click', (e)=>{ e.preventDefault(); renderList(); });
+
+// Select / Delete selected
+document.getElementById('toggleSelect').addEventListener('click', ()=>{
+  selectMode = !selectMode; selectedIds.clear();
+  document.getElementById('toggleSelect').textContent = selectMode ? 'Done selecting' : '☑️ Select';
+  renderList();
+});
+
+document.getElementById('deleteSelected').addEventListener('click', async ()=>{
+  if (!selectedIds.size) { alert('No entries selected.'); return; }
+  const pin = prompt('Enter Admin PIN to delete selected rows:'); if (!pin) return;
+  const ids = Array.from(selectedIds);
+  const token = (localStorage.getItem('jm:cfg:token') || 'JMvSource_92nF7x!qA4pLz#Xt8Kd').trim();
+  try {
+    const res = await fetch('/.netlify/functions/gsheets', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action:'delete', ids, adminPin: pin, token })
+    });
+    const j = await res.json().catch(()=>({ ok:false, error:'Invalid JSON' }));
+    if (!j.ok) throw new Error(j.error || 'Delete failed');
+    ids.forEach(id => localStorage.removeItem('jm:data:'+id));
+    alert(`Deleted ${j.deleted || 0} row(s).`);
+    selectedIds.clear(); selectMode = false; document.getElementById('toggleSelect').textContent = '☑️ Select';
+    renderList();
+  } catch (err) { alert('Delete error: ' + (err.message || err)); }
+});
+
+// Admin dialog (single delete)
+document.getElementById('adminBtn').addEventListener('click', ()=> document.getElementById('adminDlg').showModal());
+document.getElementById('adminDeleteBtn').addEventListener('click', async (e)=>{
+  e.preventDefault();
+  const id = document.getElementById('adminDeleteId').value.trim();
+  const pin = document.getElementById('adminPin').value.trim();
+  if (!id || !pin) { alert('Please enter EntryID and Admin PIN.'); return; }
+  const token = (localStorage.getItem('jm:cfg:token') || 'JMvSource_92nF7x!qA4pLz#Xt8Kd').trim();
+  try {
+    const res = await fetch('/.netlify/functions/gsheets', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action:'delete', id, adminPin: pin, token })
+    });
+    const j = await res.json().catch(()=>({ ok:false, error:'Invalid JSON' }));
+    if (!j.ok) throw new Error(j.error || 'Delete failed');
+    localStorage.removeItem('jm:data:'+id);
+    alert(`Deleted ${j.deleted || 0} row(s).`);
+    document.getElementById('adminDlg').close(); renderList();
+  } catch (err) { alert('Delete error: ' + (err.message || err)); }
+});
+
+// Settings
+const settingsDlg = document.getElementById('settingsDlg');
+document.getElementById('settingsBtn').addEventListener('click', ()=>{
+  const c = cfg.get();
+  document.getElementById('brandInput').value = c.brand;
+  document.getElementById('tokenInput').value = c.token;
+  document.getElementById('defaultMarketerName').value = c.defMarketerName;
+  document.getElementById('defaultMarketerPhone').value = c.defMarketerPhone;
+  document.getElementById('defaultMarketerEmail').value = c.defMarketerEmail;
+  settingsDlg.showModal();
+});
+document.getElementById('saveSettingsBtn').addEventListener('click', (e)=>{
+  e.preventDefault();
+  cfg.set({
+    brand: document.getElementById('brandInput').value.trim() || 'JulineMart Vendor Sourcing',
+    token: document.getElementById('tokenInput').value.trim() || 'JMvSource_92nF7x!qA4pLz#Xt8Kd',
+    defMarketerName: document.getElementById('defaultMarketerName').value.trim(),
+    defMarketerPhone: document.getElementById('defaultMarketerPhone').value.trim(),
+    defMarketerEmail: document.getElementById('defaultMarketerEmail').value.trim(),
+  });
+  settingsDlg.close();
+  const c = cfg.get();
+  if (c.defMarketerName) document.getElementById('marketerName').value = c.defMarketerName;
+  if (c.defMarketerPhone) document.getElementById('marketerPhone').value = c.defMarketerPhone;
+  if (c.defMarketerEmail) document.getElementById('marketerEmail').value = c.defMarketerEmail;
+  flushQueue();
+});
+
+// Tabs + init
+const tabForm = document.getElementById('tabForm');
+const tabRecords = document.getElementById('tabRecords');
+const viewForm = document.getElementById('viewForm');
+const viewRecords = document.getElementById('viewRecords');
+function showTab(which){
+  if (which === 'records'){ tabForm.classList.remove('active'); tabRecords.classList.add('active'); viewForm.classList.add('hidden'); viewRecords.classList.remove('hidden'); renderList(); }
+  else { tabRecords.classList.remove('active'); tabForm.classList.add('active'); viewRecords.classList.add('hidden'); viewForm.classList.remove('hidden'); }
+}
+tabForm.addEventListener('click', ()=> showTab('form'));
+tabRecords.addEventListener('click', ()=> showTab('records'));
+
+function init(){
+  applyBrand();
+  if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js')); }
+  if (!localStorage.getItem('jm:cfg:token')) localStorage.setItem('jm:cfg:token', 'JMvSource_92nF7x!qA4pLz#Xt8Kd');
+  setNet();
+  const c = cfg.get();
+  if (c.defMarketerName) document.getElementById('marketerName').value = c.defMarketerName;
+  if (c.defMarketerPhone) document.getElementById('marketerPhone').value = c.defMarketerPhone;
+  if (c.defMarketerEmail) document.getElementById('marketerEmail').value = c.defMarketerEmail;
+  renderList(); flushQueue();
+}
+init();
+</script>
+
 </script>
 </body>
 </html>
