@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,8 +9,7 @@
   <style>
     :root {
       --purple:#5E0063; --purple-dark:#3A003C; --purple-darker:#240025;
-      --orange:#ff914d; --white:#ffffff; --ink:#f9fafb; --muted:#d1d5db;
-      --pad:14px; --radius:14px;
+      --orange:#ff914d; --ink:#f9fafb;
     }
     *{ box-sizing:border-box }
     body{
@@ -19,15 +17,15 @@
       background: radial-gradient(1200px 700px at 20% -10%, var(--purple) 0%, var(--purple-dark) 45%, var(--purple-darker) 100%);
       color:var(--ink);
     }
-    .topbar{ background:rgba(255,255,255,.06); backdrop-filter: blur(8px); color:#fff; padding:10px var(--pad); display:flex; align-items:center; justify-content:space-between; position: sticky; top: 0; z-index: 10; border-bottom:1px solid rgba(255,255,255,.08); }
+    .topbar{ background:rgba(255,255,255,.06); backdrop-filter: blur(8px); color:#fff; padding:10px 14px; display:flex; align-items:center; gap:12px; position: sticky; top: 0; z-index: 10; border-bottom:1px solid rgba(255,255,255,.08); }
     .brand{ display:flex; align-items:center; gap:10px; font-weight:800 }
     .brand img{ width:36px; height:36px; border-radius:8px }
-    .wrap{ max-width:860px; margin: 16px auto; padding: 0 var(--pad) var(--pad); }
-    .card{ background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.12); border-radius: var(--radius); padding: var(--pad); box-shadow: 0 16px 40px rgba(0,0,0,.35); }
+    .actionsRight { margin-left:auto; display:flex; gap:8px; align-items:center; }
+    .wrap{ max-width:860px; margin: 16px auto; padding: 0 14px 14px; }
+    .card{ background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; padding: 14px; box-shadow: 0 16px 40px rgba(0,0,0,.35); }
     label{ display:block; font-size:.95rem; margin: 8px 0 4px; color:#fff }
     input, select, textarea{ width:100%; background: rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.25); border-radius: 12px; padding: 12px; font-size: 1rem; outline: none; transition: background .2s, border-color .2s, box-shadow .2s; }
-    select{ background-color:#3A003C; color:#fff; }
-    option{ background-color:#3A003C; color:#fff; }
+    select, option{ background-color:#3A003C; color:#fff; }
     input::placeholder, textarea::placeholder{ color:rgba(255,255,255,.65) }
     input:focus, select:focus, textarea:focus{ background: rgba(255,255,255,.18); border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255,145,77,.25); }
     textarea{ min-height: 110px; }
@@ -52,10 +50,7 @@
     dialog{ border:none; border-radius:14px; background:#1b1120; color:#fff; padding:16px; width:min(860px,92vw) } dialog::backdrop{ background:rgba(0,0,0,.6) }
     .pill{ display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.5); color:#fff; font-size:.8rem }
     hr.sep{ border:none; border-top:1px dashed rgba(255,255,255,.2); margin:12px 0 }
-    .footer{ text-align:center; color: rgba(255,255,255,.75); font-size:.85rem; margin-top:12px }
-    .toast{ position:fixed; left:50%; transform:translateX(-50%); bottom:16px; background:#065f46; color:#fff; padding:10px 14px; border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,.2); opacity:0; pointer-events:none; transition:opacity .2s }
-    .toast.show{ opacity:1 } .toast.err{ background:#7f1d1d }
-    .tools{ display:flex; gap:8px; justify-content:flex-end; margin:6px 0 0 }
+    .footer{ text-align:center; color: rgba(255,255,255,.75); font-size:.9rem; margin-top:12px }
     .searchRow{ display:flex; gap:8px; align-items:center; margin:8px 0 }
     .searchRow .searchBtn{ width:48px; height:48px; display:flex; align-items:center; justify-content:center; font-size:20px }
   </style>
@@ -66,12 +61,14 @@
       <img src="./icons/icon-192.png" alt="JulineMart logo">
       <div id="brand">JulineMart Vendor Sourcing</div>
     </div>
-    <button id="settingsBtn" class="btn ghost">⚙️</button>
+    <div class="actionsRight">
+      <button id="settingsBtn" class="btn ghost">⚙️</button>
+      <button id="adminBtn" class="btn ghost">Admin</button>
+    </div>
   </div>
 
   <div class="wrap">
     <div class="card">
-
       <div class="tabs">
         <div id="tabForm" class="tab active">Form</div>
         <div id="tabRecords" class="tab">My Records</div>
@@ -198,22 +195,25 @@
           <button id="doSearch" class="btn searchBtn" title="Search">🔎</button>
         </div>
         <div class="tools">
+          <button id="toggleSelect" class="btn">☑️ Select</button>
+          <button id="deleteSelected" class="btn">🗑 Delete selected</button>
           <button id="syncNow" class="btn">⟳ Sync queued now</button>
           <button id="exportCSV" class="btn">⬇️ Export My Records (CSV)</button>
         </div>
         <div id="list" class="list"></div>
       </div>
+
       <div class="footer">
-  <a href="https://docs.google.com/spreadsheets/d/1Oy5sctouREFW7Sr84LQlkaXevX-LiYKYw_TdcEH6p3A/edit#gid=0"
-     target="_blank" rel="noopener"
-     class="tiny" style="color:#ff914d;text-decoration:underline">
-     Open Sheet (Admin)
-  </a>
-  • Add to Home Screen on Android (⋮ → Add to Home screen) • iPhone Safari (Share → Add to Home Screen). Works offline.
-</div>
+        <a href="https://docs.google.com/spreadsheets/d/1Oy5sctouREFW7Sr84LQlkaXevX-LiYKYw_TdcEH6p3A/edit#gid=0"
+           target="_blank" rel="noopener" class="tiny" style="color:#ff914d;text-decoration:underline">
+           Open Sheet (Admin)
+        </a>
+        • Add to Home Screen on Android (⋮ → Add to Home screen) • iPhone Safari (Share → Add to Home Screen). Works offline.
+      </div>
     </div>
   </div>
 
+  <!-- Settings dialog -->
   <dialog id="settingsDlg">
     <form method="dialog">
       <h3 style="margin:0 0 10px;">Settings</h3>
@@ -229,14 +229,30 @@
       <label>Default Marketer Email (auto-fill)
         <input id="defaultMarketerEmail" type="email" placeholder="e.g., staff@julinemart.com">
       </label>
-      <label>Shared Token (must match your Apps Script TOKEN)
+      <label>Shared Token (must match Apps Script TOKEN)
         <input id="tokenInput" type="text" placeholder="long-random-string">
       </label>
-      <div class="tiny">Images are sent as base64 and stored in Drive if your Apps Script has a Drive folder ID set.</div>
+      <div class="tiny">Images are sent as base64 when enabled in backend.</div>
       <div style="text-align:right; margin-top:10px;">
         <button value="cancel" class="btn">Cancel</button>
         <button id="saveSettingsBtn" value="default" class="btn primary">Save</button>
       </div>
+    </form>
+  </dialog>
+
+  <!-- Admin tools dialog -->
+  <dialog id="adminDlg">
+    <form method="dialog">
+      <h3 style="margin:0 0 10px;">Admin tools</h3>
+      <label>EntryID to delete</label>
+      <input type="text" id="adminDeleteId" placeholder="Paste the EntryID (e.g., 2025-09-12T10:23:45Z)">
+      <label>Admin PIN</label>
+      <input type="password" id="adminPin" placeholder="Enter admin PIN">
+      <div style="text-align:right; margin-top:10px;">
+        <button value="cancel" class="btn">Close</button>
+        <button id="adminDeleteBtn" value="default" class="btn primary">🗑 Delete</button>
+      </div>
+      <div class="tiny" style="margin-top:6px;">Tip: for multiple deletions, use Records → ☑️ Select → 🗑 Delete selected.</div>
     </form>
   </dialog>
 
@@ -254,16 +270,10 @@
 
   <script>
     function toast(msg, ok=true){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show '+(ok?'':'err'); setTimeout(()=>{ t.className='toast'; }, 2000); }
+    function setNet(){ const s=document.getElementById('onlineTxt'); if (navigator.onLine){ s.textContent='Online'; s.className='online'; } else { s.textContent='Offline'; s.className='offline'; } }
+    window.addEventListener('online', setNet); window.addEventListener('offline', setNet);
 
-    function setNet(){
-      const s = document.getElementById('onlineTxt');
-      if (navigator.onLine) { s.textContent='Online'; s.className='online'; }
-      else { s.textContent='Offline'; s.className='offline'; }
-    }
-    window.addEventListener('online', setNet);
-    window.addEventListener('offline', setNet);
-
-    // CONFIG (no endpoint; baked in serverless function). Keep token for future rotations.
+    // CONFIG
     const cfg = {
       get: ()=> ({
         brand: localStorage.getItem('jm:cfg:brand') || 'JulineMart Vendor Sourcing',
@@ -272,29 +282,22 @@
         defMarketerPhone: localStorage.getItem('jm:cfg:defMarketerPhone') || '',
         defMarketerEmail: localStorage.getItem('jm:cfg:defMarketerEmail') || ''
       }),
-      set: (o)=>{
-        if (o.brand !== undefined) localStorage.setItem('jm:cfg:brand', o.brand);
-        if (o.token !== undefined) localStorage.setItem('jm:cfg:token', o.token);
-        if (o.defMarketerName !== undefined) localStorage.setItem('jm:cfg:defMarketerName', o.defMarketerName);
-        if (o.defMarketerPhone !== undefined) localStorage.setItem('jm:cfg:defMarketerPhone', o.defMarketerPhone);
-        if (o.defMarketerEmail !== undefined) localStorage.setItem('jm:cfg:defMarketerEmail', o.defMarketerEmail);
-        applyBrand();
-      }
+      set: (o)=>{ if (o.brand!==undefined) localStorage.setItem('jm:cfg:brand', o.brand);
+                  if (o.token!==undefined) localStorage.setItem('jm:cfg:token', o.token);
+                  if (o.defMarketerName!==undefined) localStorage.setItem('jm:cfg:defMarketerName', o.defMarketerName);
+                  if (o.defMarketerPhone!==undefined) localStorage.setItem('jm:cfg:defMarketerPhone', o.defMarketerPhone);
+                  if (o.defMarketerEmail!==undefined) localStorage.setItem('jm:cfg:defMarketerEmail', o.defMarketerEmail);
+                  applyBrand(); }
     };
-    function applyBrand(){ const c = cfg.get(); document.getElementById('brand').textContent = c.brand; document.title = c.brand; }
+    function applyBrand(){ const c=cfg.get(); document.getElementById('brand').textContent=c.brand; document.title=c.brand; }
 
-    const dataKey = (id)=> 'jm:data:'+id;
+    const dataKey = id => 'jm:data:'+id;
     const queueKey = 'jm:queue';
     function idNow(){ return new Date().toISOString(); }
 
     async function filesToBase64List(input){
-      const files = Array.from(input.files || []);
-      const out = [];
-      for (const f of files){
-        const buf = await f.arrayBuffer();
-        const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
-        out.push({ filename: f.name, mimeType: f.type || 'application/octet-stream', data: b64 });
-      }
+      const files = Array.from(input.files || []); const out=[];
+      for (const f of files){ const buf=await f.arrayBuffer(); const b64=btoa(String.fromCharCode(...new Uint8Array(buf))); out.push({ filename:f.name, mimeType:f.type||'application/octet-stream', data:b64 }); }
       return out;
     }
 
@@ -323,7 +326,7 @@
     function validate(p){
       const req = [
         ['Marketer’s Name', p.marketerName],
-        ['Marketer\'s Phone', p.marketerPhone],
+        ['Marketer\\'s Phone', p.marketerPhone],
         ['Vendor/Business Name', p.vendorName],
         ['Contact Person Name', p.contactPerson],
         ['Vendor Phone Number', p.vendorPhone],
@@ -334,51 +337,36 @@
         ['Has the vendor shown interest in registering?', p.interest],
         ['Preferred onboarding method', p.onboarding]
       ];
-      for (const [label, val] of req){
-        if (!val){ alert('Please fill required field: '+label); return false; }
-      }
+      for (const [label, val] of req){ if (!val){ alert('Please fill required field: '+label); return false; } }
       return true;
     }
 
     function saveLocal(p){ localStorage.setItem(dataKey(p.id), JSON.stringify(p)); }
     function allLocal(){
-      return Object.keys(localStorage).filter(k=>k.startsWith('jm:data:')).map(k=>JSON.parse(localStorage.getItem(k)||'{}')).sort((a,b)=> a.id < b.id ? 1 : -1);
+      return Object.keys(localStorage).filter(k=>k.startsWith('jm:data:'))
+        .map(k=>JSON.parse(localStorage.getItem(k)||'{}'))
+        .sort((a,b)=> a.id < b.id ? 1 : -1);
     }
-
-    function queue(item){
-      const q = JSON.parse(localStorage.getItem(queueKey) || '[]');
-      q.push(item); localStorage.setItem(queueKey, JSON.stringify(q));
-    }
+    function queue(item){ const q=JSON.parse(localStorage.getItem(queueKey)||'[]'); q.push(item); localStorage.setItem(queueKey, JSON.stringify(q)); }
 
     async function postViaProxy(payload, images){
       const { token } = cfg.get();
-      if(!token) throw new Error('No token configured');
-      const ctrl = new AbortController();
-      const id = setTimeout(()=> ctrl.abort(), 20000);
+      const ctrl = new AbortController(); const id = setTimeout(()=> ctrl.abort(), 20000);
       const res = await fetch('/.netlify/functions/gsheets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, ...payload, images }),
         signal: ctrl.signal
       });
       clearTimeout(id);
-      if (!res.ok) {
-        const text = await res.text().catch(()=>'');
-        throw new Error('HTTP '+res.status+' '+text);
-      }
       const j = await res.json().catch(()=>({ ok:false, error:'Invalid JSON from server' }));
-      if (!j.ok) throw new Error(j.error || 'Sheets error');
+      if (!res.ok || !j.ok) throw new Error(j.error || ('HTTP '+res.status));
       return j;
     }
 
     async function flushQueue(){
-      const q = JSON.parse(localStorage.getItem(queueKey) || '[]');
-      if(!q.length) return;
+      const q = JSON.parse(localStorage.getItem(queueKey) || '[]'); if(!q.length) return;
       const keep = [];
-      for (const item of q){
-        try { await postViaProxy(item.payload, item.images||[]); }
-        catch(e){ keep.push(item); }
-      }
+      for (const item of q){ try { await postViaProxy(item.payload, item.images||[]); } catch(e){ keep.push(item); } }
       localStorage.setItem(queueKey, JSON.stringify(keep));
       toast(keep.length ? ('Some items still queued: '+keep.length) : 'All queued items synced ✓', keep.length===0);
       renderList();
@@ -395,6 +383,10 @@
       if (c.defMarketerEmail) document.getElementById('marketerEmail').value = c.defMarketerEmail;
     }
 
+    // RECORDS with select mode + multi-delete
+    let selectMode = false;
+    const selectedIds = new Set();
+
     function renderList(){
       const list = document.getElementById('list');
       const t = (document.getElementById('fText').value || '').toLowerCase().trim();
@@ -403,29 +395,43 @@
         const hay = [p.marketerName,p.vendorName,p.contactPerson,p.category,p.sellsOnline,p.whereOnline,p.challenges,p.comments].join(' ').toLowerCase();
         return hay.includes(t);
       });
+
       list.innerHTML = '';
       if(!items.length){
-        const div = document.createElement('div');
-        div.className = 'item';
-        div.textContent = 'No records match your search.';
-        list.appendChild(div);
-        return;
+        const div = document.createElement('div'); div.className = 'item';
+        div.textContent = 'No records match your search.'; list.appendChild(div); return;
       }
       items.forEach(p=>{
-        const div = document.createElement('div');
-        div.className = 'item';
+        const div = document.createElement('div'); div.className = 'item';
+        const idShort = p.id ? p.id.slice(0, 19) : '';
+        const checkbox = selectMode ? `<input type="checkbox" class="sel" data-id="${p.id}" style="margin-right:8px;">` : '';
         div.innerHTML = `
           <div class="row">
-            <div><strong>${p.vendorName}</strong>
-              <div class="tiny">${p.category} • ${p.sellsOnline}${p.whereOnline? ' ('+p.whereOnline+')':''} • <span class="mono">${p.id.slice(0,10)}</span></div>
+            <div style="display:flex; align-items:center;">
+              ${checkbox}
+              <div>
+                <strong>${p.vendorName}</strong>
+                <div class="tiny">${p.category} • ${p.sellsOnline}${p.whereOnline? ' ('+p.whereOnline+')':''} • <span class="mono" title="${p.id}">${idShort}</span></div>
+              </div>
             </div>
             <div class="pill tiny">${p.interest}</div>
           </div>
           <div class="tiny" style="margin-top:6px;"><strong>Marketer:</strong> ${p.marketerName} • <strong>Contact:</strong> ${p.contactPerson}</div>
         `;
-        div.addEventListener('click', ()=> showDetail(p));
+        if (!selectMode) {
+          div.addEventListener('click', ()=> showDetail(p));
+        }
         list.appendChild(div);
       });
+
+      if (selectMode) {
+        list.querySelectorAll('input.sel').forEach(cb=>{
+          cb.addEventListener('change', (e)=>{
+            const id = e.currentTarget.dataset.id;
+            if (e.currentTarget.checked) selectedIds.add(id); else selectedIds.delete(id);
+          });
+        });
+      }
     }
 
     function showDetail(p){
@@ -448,66 +454,86 @@
       document.getElementById('detailDlg').showModal();
     }
 
-    function exportCSV(){
-      const items = allLocal();
-      const rows = [[
-        'ID','Marketer’s Name','Marketer Phone','Marketer Email','Vendor/Business Name','Contact Person Name',
-        'Vendor Phone','Vendor Email','Business Address','Category','Sells Online','Where',
-        'Interest','Onboarding','Challenges','Comments'
-      ]];
-      items.forEach(p=> rows.push([p.id,p.marketerName,p.marketerPhone,p.marketerEmail,p.vendorName,p.contactPerson,p.vendorPhone,p.vendorEmail,p.businessAddress,p.category,p.sellsOnline,p.whereOnline,p.interest,p.onboarding,(p.challenges||'').replace(/\n/g,' '),(p.comments||'').replace(/\n/g,' ')]));
-      const csv = rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
-      const blob = new Blob([csv], {type:'text/csv'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'jm-sourcing-records.csv';
-      document.body.appendChild(a); a.click(); a.remove();
-    }
-
+    // Save / Submit
     document.getElementById('saveBtn').addEventListener('click', async (ev)=>{
       const btn = ev.currentTarget;
       const payload = getPayload();
       if (!validate(payload)) return;
-      btn.disabled = true;
-      const original = btn.textContent;
-      btn.textContent = 'Saving…';
+      btn.disabled = true; const original = btn.textContent; btn.textContent = 'Saving…';
       saveLocal(payload);
       const images = await filesToBase64List(document.getElementById('images'));
-      try {
-        await postViaProxy(payload, images);
-        toast('Saved and synced ✓', true);
-        btn.textContent = 'Saved ✓';
-        setTimeout(()=> btn.textContent = original, 900);
-      } catch (e) {
-        queue({ payload, images });
-        console.error('Sync failed:', e);
-        toast('Saved locally. ' + e.message, false);
-        btn.textContent = 'Queued ⟳';
-        setTimeout(()=> btn.textContent = original, 1400);
-      } finally {
-        btn.disabled = false;
-      }
+      try { await postViaProxy(payload, images); toast('Saved and synced ✓', true); btn.textContent = 'Saved ✓'; setTimeout(()=> btn.textContent = original, 900); }
+      catch (e){ queue({ payload, images }); console.error('Sync failed:', e); toast('Saved locally. ' + e.message, false); btn.textContent = 'Queued ⟳'; setTimeout(()=> btn.textContent = original, 1400); }
+      finally { btn.disabled = false; }
       renderList();
     });
-    document.getElementById('exportCSV').addEventListener('click', exportCSV);
+
+    // Records tools
+    document.getElementById('exportCSV').addEventListener('click', ()=>{
+      const items = allLocal();
+      const rows = [[
+        'ID','Marketer’s Name','Marketer Phone','Marketer Email','Vendor/Business Name','Contact Person Name',
+        'Vendor Phone','Vendor Email','Business Address','Category','Sells Online','Where',
+        'Interest','Onboarding','Challenges','Comments','Device'
+      ]];
+      items.forEach(p=> rows.push([p.id,p.marketerName,p.marketerPhone,p.marketerEmail,p.vendorName,p.contactPerson,p.vendorPhone,p.vendorEmail,p.businessAddress,p.category,p.sellsOnline,p.whereOnline,p.interest,p.onboarding,(p.challenges||'').replace(/\n/g,' '),(p.comments||'').replace(/\n/g,' '),p.device]));
+      const csv = rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv'}); const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = 'jm-sourcing-records.csv'; document.body.appendChild(a); a.click(); a.remove();
+    });
+
     document.getElementById('syncNow').addEventListener('click', (e)=>{ e.preventDefault(); flushQueue(); });
+    document.getElementById('fText').addEventListener('input', renderList);
+    document.getElementById('doSearch').addEventListener('click', (e)=>{ e.preventDefault(); renderList(); });
 
-    const tabForm = document.getElementById('tabForm');
-    const tabRecords = document.getElementById('tabRecords');
-    const viewForm = document.getElementById('viewForm');
-    const viewRecords = document.getElementById('viewRecords');
-    function showTab(which){
-      if (which === 'records'){
-        tabForm.classList.remove('active'); tabRecords.classList.add('active');
-        viewForm.classList.add('hidden'); viewRecords.classList.remove('hidden'); renderList();
-      } else {
-        tabRecords.classList.remove('active'); tabForm.classList.add('active');
-        viewRecords.classList.add('hidden'); viewForm.classList.remove('hidden');
-      }
-    }
-    tabForm.addEventListener('click', ()=> showTab('form'));
-    tabRecords.addEventListener('click', ()=> showTab('records'));
+    // Select / Delete selected
+    document.getElementById('toggleSelect').addEventListener('click', ()=>{
+      selectMode = !selectMode; selectedIds.clear();
+      document.getElementById('toggleSelect').textContent = selectMode ? '✅ Done selecting' : '☑️ Select';
+      renderList();
+    });
 
+    document.getElementById('deleteSelected').addEventListener('click', async ()=>{
+      if (!selectedIds.size) { alert('No entries selected.'); return; }
+      const pin = prompt('Enter Admin PIN to delete selected rows:'); if (!pin) return;
+      const ids = Array.from(selectedIds);
+      const token = (localStorage.getItem('jm:cfg:token') || 'JMvSource_92nF7x!qA4pLz#Xt8Kd').trim();
+      try {
+        const res = await fetch('/.netlify/functions/gsheets', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action:'delete', ids, adminPin: pin, token })
+        });
+        const j = await res.json().catch(()=>({ ok:false, error:'Invalid JSON' }));
+        if (!j.ok) throw new Error(j.error || 'Delete failed');
+        ids.forEach(id => localStorage.removeItem('jm:data:'+id));
+        alert(`Deleted ${j.deleted || 0} row(s) from ${j.sheetName || 'Responses'}.`);
+        selectedIds.clear(); selectMode = false; document.getElementById('toggleSelect').textContent = '☑️ Select';
+        renderList();
+      } catch (err) { alert('Delete error: ' + (err.message || err)); }
+    });
+
+    // Admin dialog (single delete)
+    document.getElementById('adminBtn').addEventListener('click', ()=> document.getElementById('adminDlg').showModal());
+    document.getElementById('adminDeleteBtn').addEventListener('click', async (e)=>{
+      e.preventDefault();
+      const id = document.getElementById('adminDeleteId').value.trim();
+      const pin = document.getElementById('adminPin').value.trim();
+      if (!id || !pin) { alert('Please enter EntryID and Admin PIN.'); return; }
+      const token = (localStorage.getItem('jm:cfg:token') || 'JMvSource_92nF7x!qA4pLz#Xt8Kd').trim();
+      try {
+        const res = await fetch('/.netlify/functions/gsheets', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action:'delete', id, adminPin: pin, token })
+        });
+        const j = await res.json().catch(()=>({ ok:false, error:'Invalid JSON' }));
+        if (!j.ok) throw new Error(j.error || 'Delete failed');
+        localStorage.removeItem('jm:data:'+id);
+        alert(`Deleted ${j.deleted || 0} row(s) from ${j.sheetName || 'Responses'}.`);
+        document.getElementById('adminDlg').close(); renderList();
+      } catch (err) { alert('Delete error: ' + (err.message || err)); }
+    });
+
+    // Settings
     const settingsDlg = document.getElementById('settingsDlg');
     document.getElementById('settingsBtn').addEventListener('click', ()=>{
       const c = cfg.get();
@@ -535,75 +561,30 @@
       flushQueue();
     });
 
+    // Tabs + init
+    const tabForm = document.getElementById('tabForm');
+    const tabRecords = document.getElementById('tabRecords');
+    const viewForm = document.getElementById('viewForm');
+    const viewRecords = document.getElementById('viewRecords');
+    function showTab(which){
+      if (which === 'records'){ tabForm.classList.remove('active'); tabRecords.classList.add('active'); viewForm.classList.add('hidden'); viewRecords.classList.remove('hidden'); renderList(); }
+      else { tabRecords.classList.remove('active'); tabForm.classList.add('active'); viewRecords.classList.add('hidden'); viewForm.classList.remove('hidden'); }
+    }
+    tabForm.addEventListener('click', ()=> showTab('form'));
+    tabRecords.addEventListener('click', ()=> showTab('records'));
+
     function init(){
       applyBrand();
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js'));
-      }
+      if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js')); }
       if (!localStorage.getItem('jm:cfg:token')) localStorage.setItem('jm:cfg:token', 'JMvSource_92nF7x!qA4pLz#Xt8Kd');
       setNet();
       const c = cfg.get();
       if (c.defMarketerName) document.getElementById('marketerName').value = c.defMarketerName;
       if (c.defMarketerPhone) document.getElementById('marketerPhone').value = c.defMarketerPhone;
       if (c.defMarketerEmail) document.getElementById('marketerEmail').value = c.defMarketerEmail;
-      renderList();
-      flushQueue();
+      renderList(); flushQueue();
     }
     init();
-
-    document.getElementById('fText').addEventListener('input', renderList);
-    document.getElementById('doSearch').addEventListener('click', (e)=>{ e.preventDefault(); renderList(); });
   </script>
-  <!-- Admin tools dialog -->
-<dialog id="adminDlg">
-  <form method="dialog">
-    <h3 style="margin:0 0 10px;">Admin tools</h3>
-    <label>EntryID to delete</label>
-    <input type="text" id="adminDeleteId" placeholder="Paste the EntryID (e.g., 2025-09-12T10:23:45Z)">
-    <label>Admin PIN</label>
-    <input type="password" id="adminPin" placeholder="Enter admin PIN">
-    <div style="text-align:right; margin-top:10px;">
-      <button value="cancel" class="btn">Close</button>
-      <button id="adminDeleteBtn" value="default" class="btn primary">🗑 Delete</button>
-    </div>
-  </form>
-</dialog>
-
-<script>
-  // Add Admin button next to the settings cog
-  (function addAdminButton(){
-    const topbar = document.querySelector('.topbar');
-    const btn = document.createElement('button');
-    btn.className = 'btn ghost';
-    btn.textContent = 'Admin';
-    btn.style.marginLeft = '8px';
-    btn.onclick = () => document.getElementById('adminDlg').showModal();
-    topbar.appendChild(btn);
-  })();
-
-  document.getElementById('adminDeleteBtn').addEventListener('click', async (e)=>{
-    e.preventDefault();
-    const id = document.getElementById('adminDeleteId').value.trim();
-    const pin = document.getElementById('adminPin').value.trim();
-    if (!id || !pin) { alert('Please enter EntryID and Admin PIN.'); return; }
-
-    // Use the same token as the app (or force your known token here)
-    const token = (localStorage.getItem('jm:cfg:token') || 'JMvSource_92nF7x!qA4pLz#Xt8Kd').trim();
-
-    try {
-      const res = await fetch('/.netlify/functions/gsheets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action:'delete', id, adminPin: pin, token })
-      });
-      const j = await res.json().catch(()=>({ ok:false, error:'Invalid JSON' }));
-      if (!j.ok) throw new Error(j.error || 'Delete failed');
-      alert(`Deleted ${j.deleted || 0} row(s) from ${j.sheetName || 'Responses'}.`);
-      document.getElementById('adminDlg').close();
-    } catch (err) {
-      alert('Delete error: ' + (err.message || err));
-    }
-  });
-</script>
 </body>
 </html>
