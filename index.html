@@ -482,11 +482,12 @@ function validate(p){
     // Records tools
     document.getElementById('exportCSV').addEventListener('click', ()=>{
       const items = allLocal();
-      const rows = [[
-        'ID','Marketer’s Name','Marketer Phone','Marketer Email','Vendor/Business Name','Contact Person Name',
-        'Vendor Phone','Vendor Email','Business Address','Category','Sells Online','Where',
-        'Interest','Onboarding','Challenges','Comments','Device'
-      ]];
+      rows = [[
+  "ID","Marketer's Name","Marketer Phone","Marketer Email",
+  "Vendor/Business Name","Contact Person Name","Vendor Phone","Vendor Email",
+  "Business Address","Category","Sells Online","Where",
+  "Interest","Onboarding","Challenges","Comments","Device"
+]];
       items.forEach(p=> rows.push([p.id,p.marketerName,p.marketerPhone,p.marketerEmail,p.vendorName,p.contactPerson,p.vendorPhone,p.vendorEmail,p.businessAddress,p.category,p.sellsOnline,p.whereOnline,p.interest,p.onboarding,(p.challenges||'').replace(/\n/g,' '),(p.comments||'').replace(/\n/g,' '),p.device]));
       const csv = rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
       const blob = new Blob([csv], {type:'text/csv'}); const a = document.createElement('a');
