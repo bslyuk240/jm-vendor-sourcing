@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jm-sourcing-full-v13'; // bumped cache name
+const CACHE_NAME = 'jm-sourcing-full-v14'; // bump this
 const ASSETS = [
   './',
   './index.html',
