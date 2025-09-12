@@ -1,3 +1,9 @@
+<script>
+  // Catch any JS errors so we can see them on device
+  window.onerror = function(msg, src, line, col, err){
+    alert("App error: " + msg + "\n" + (src||'') + ":" + line + ":" + col);
+  };
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
