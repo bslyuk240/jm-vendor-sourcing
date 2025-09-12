@@ -1,5 +1,5 @@
 // netlify/functions/gsheets.js
-const ENDPOINT = "https://script.google.com/macros/s/AKfycbxDc16IlTugm3onXHZjTy0AwxcTrQ3lbOPg3XTaQAj0n8gvvFzhbmX2w6fxyK9BVSckrQ/exec";
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbzQiWORxlGSL92W-QtB7XfXBCRF98GBa5ByB7PqP4_zKJOwQb2Fy80Lhx_BqUN5sVZRLg/exec";
 
 exports.handler = async function(event) {
   const headers = {
