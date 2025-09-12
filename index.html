@@ -72,7 +72,7 @@
       <div id="tabRecords" class="tab">My Records</div>
     </div>
 
-    <!-- === FORM === -->
+    <!-- FORM -->
     <div id="viewForm">
       <div class="grid2">
         <div>
@@ -186,7 +186,7 @@
       </div>
     </div>
 
-    <!-- === RECORDS === -->
+    <!-- RECORDS -->
     <div id="viewRecords" class="hidden">
       <div class="searchRow">
         <input type="text" id="fText" placeholder="Search vendor, staff, comments…">
@@ -206,23 +206,65 @@
         target="_blank" rel="noopener" class="tiny" style="color:#ff914d;text-decoration:underline">
         Open Sheet (Admin)
       </a>
+      • Add to Home Screen on Android (⋮ → Add to Home screen) • iPhone Safari (Share → Add to Home Screen). Works offline.
     </div>
   </div>
 </div>
 
-<!-- dialogs (settings, admin, detail) -->
-<dialog id="settingsDlg">…</dialog>
-<dialog id="adminDlg">…</dialog>
-<dialog id="detailDlg">…</dialog>
+<!-- dialogs -->
+<dialog id="settingsDlg">
+  <form method="dialog">
+    <h3 style="margin:0 0 10px;">Settings</h3>
+    <label>Brand / Title
+      <input id="brandInput" type="text" placeholder="JulineMart Vendor Sourcing">
+    </label>
+    <label>Default Marketer's Name (auto-fill)
+      <input id="defaultMarketerName" type="text" placeholder="e.g., John Doe">
+    </label>
+    <label>Default Marketer Phone (auto-fill)
+      <input id="defaultMarketerPhone" type="tel" placeholder="e.g., 0803...">
+    </label>
+    <label>Default Marketer Email (auto-fill)
+      <input id="defaultMarketerEmail" type="email" placeholder="e.g., staff@julinemart.com">
+    </label>
+    <label>Shared Token (must match Apps Script TOKEN)
+      <input id="tokenInput" type="text" placeholder="long-random-string">
+    </label>
+    <div class="tiny">Images are sent as base64 when enabled in backend.</div>
+    <div style="text-align:right; margin-top:10px;">
+      <button value="cancel" class="btn">Cancel</button>
+      <button id="saveSettingsBtn" value="default" class="btn primary">Save</button>
+    </div>
+  </form>
+</dialog>
 
-<div id="toast" class="toast"></div>
+<dialog id="adminDlg">
+  <form method="dialog">
+    <h3 style="margin:0 0 10px;">Admin tools</h3>
+    <label>EntryID to delete</label>
+    <input type="text" id="adminDeleteId" placeholder="Paste the EntryID (e.g., 2025-09-12T10:23:45Z)">
+    <label>Admin PIN</label>
+    <input type="password" id="adminPin" placeholder="Enter admin PIN">
+    <div style="text-align:right; margin-top:10px;">
+      <button value="cancel" class="btn">Close</button>
+      <button id="adminDeleteBtn" value="default" class="btn primary">🗑 Delete</button>
+    </div>
+    <div class="tiny" style="margin-top:6px;">Tip: for multiple deletions, use Records → Select → Delete selected.</div>
+  </form>
+</dialog>
 
-<script>
-// catch errors
-window.onerror = function(msg, src, line, col){
-  alert("App error: " + msg + " (" + line + ":" + col + ")");
-};
-</script>
+<dialog id="detailDlg">
+  <form method="dialog">
+    <h3 style="margin:0 0 10px;">Vendor entry (read-only)</h3>
+    <div id="detailBody" class="tiny"></div>
+    <div style="text-align:right; margin-top:10px;">
+      <button value="cancel" class="btn">Close</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
 <script>
 // error catcher
 window.onerror = function(msg, src, line, col){ alert("App error: " + msg + " (" + line + ":" + col + ")"); };
@@ -296,7 +338,7 @@ function validate(p){
     ["Preferred onboarding",       p.onboarding]
   ];
   for (const [label, val] of required) {
-    if (!val) { alert(`Please fill required field: ${label}`); return false; }
+    if (!val) { alert("Please fill required field: " + label); return false; }
   }
   return true;
 }
@@ -364,28 +406,27 @@ function renderList(){
   items.forEach(p=>{
     const div = document.createElement('div'); div.className = 'item';
     const idShort = p.id ? p.id.slice(0, 19) : '';
-    const checkbox = selectMode ? `<input type="checkbox" class="sel" data-id="${p.id}" style="margin-right:8px;">` : '';
-    div.innerHTML = `
-      <div class="row">
-        <div style="display:flex; align-items:center;">
-          ${checkbox}
-          <div>
-            <strong>${p.vendorName}</strong>
-            <div class="tiny">${p.category} • ${p.sellsOnline}${p.whereOnline? ' ('+p.whereOnline+')':''} • <span class="mono" title="${p.id}">${idShort}</span></div>
-          </div>
-        </div>
-        <div class="pill tiny">${p.interest}</div>
-      </div>
-      <div class="tiny" style="margin-top:6px;"><strong>Marketer:</strong> ${p.marketerName} • <strong>Contact:</strong> ${p.contactPerson}</div>
-    `;
-    if (!selectMode) div.addEventListener('click', ()=> showDetail(p));
+    const checkbox = selectMode ? '<input type="checkbox" class="sel" data-id="'+p.id+'" style="margin-right:8px;">' : '';
+    div.innerHTML = ''
+      + '<div class="row">'
+      + '  <div style="display:flex; align-items:center;">'
+      +      checkbox
+      + '    <div><strong>'+p.vendorName+'</strong>'
+      + '      <div class="tiny">'+p.category+' • '+p.sellsOnline+(p.whereOnline? ' ('+p.whereOnline+')':'' )+' • '
+      + '        <span class="mono" title="'+p.id+'">'+idShort+'</span></div>'
+      + '    </div>'
+      + '  </div>'
+      + '  <div class="pill tiny">'+p.interest+'</div>'
+      + '</div>'
+      + '<div class="tiny" style="margin-top:6px;"><strong>Marketer:</strong> '+p.marketerName+' • <strong>Contact:</strong> '+p.contactPerson+'</div>';
+    if (!selectMode) { div.addEventListener('click', function(){ showDetail(p); }); }
     list.appendChild(div);
   });
 
   if (selectMode) {
-    list.querySelectorAll('input.sel').forEach(cb=>{
-      cb.addEventListener('change', (e)=>{
-        const id = e.currentTarget.dataset.id;
+    list.querySelectorAll('input.sel').forEach(function(cb){
+      cb.addEventListener('change', function(e){
+        const id = e.currentTarget.getAttribute('data-id');
         if (e.currentTarget.checked) selectedIds.add(id); else selectedIds.delete(id);
       });
     });
@@ -394,64 +435,65 @@ function renderList(){
 
 function showDetail(p){
   const b = document.getElementById('detailBody');
-  const esc = s => String(s||'').replace(/</g,'&lt;');
-  b.innerHTML = `
-    <div><strong>ID:</strong> <span class="mono">${esc(p.id)}</span></div>
-    <hr class="sep">
-    <div><strong>Marketer:</strong> ${esc(p.marketerName)} • ${esc(p.marketerPhone)} ${p.marketerEmail? '• '+esc(p.marketerEmail):''}</div>
-    <div><strong>Vendor:</strong> ${esc(p.vendorName)}</div>
-    <div><strong>Contact Person:</strong> ${esc(p.contactPerson)}</div>
-    <div><strong>Phone / Email:</strong> ${esc(p.vendorPhone)} • ${esc(p.vendorEmail)}</div>
-    <div><strong>Address:</strong> ${esc(p.businessAddress)}</div>
-    <div><strong>Category:</strong> ${esc(p.category)}</div>
-    <div><strong>Sells online:</strong> ${esc(p.sellsOnline)} ${p.whereOnline? '('+esc(p.whereOnline)+')':''}</div>
-    <div><strong>Interest:</strong> ${esc(p.interest)} • <strong>Onboarding:</strong> ${esc(p.onboarding)}</div>
-    ${p.challenges? `<div><strong>Challenges:</strong> ${esc(p.challenges)}</div>`:''}
-    ${p.comments? `<div><strong>Marketer comments:</strong> ${esc(p.comments)}</div>`:''}
-  `;
+  function esc(s){ return String(s||'').replace(/</g,'&lt;'); }
+  b.innerHTML =
+    '<div><strong>ID:</strong> <span class="mono">'+esc(p.id)+'</span></div>' +
+    '<hr class="sep">' +
+    '<div><strong>Marketer:</strong> '+esc(p.marketerName)+' • '+esc(p.marketerPhone)+' '+(p.marketerEmail? '• '+esc(p.marketerEmail):'')+'</div>' +
+    '<div><strong>Vendor:</strong> '+esc(p.vendorName)+'</div>' +
+    '<div><strong>Contact Person:</strong> '+esc(p.contactPerson)+'</div>' +
+    '<div><strong>Phone / Email:</strong> '+esc(p.vendorPhone)+' • '+esc(p.vendorEmail)+'</div>' +
+    '<div><strong>Address:</strong> '+esc(p.businessAddress)+'</div>' +
+    '<div><strong>Category:</strong> '+esc(p.category)+'</div>' +
+    '<div><strong>Sells online:</strong> '+esc(p.sellsOnline)+' '+(p.whereOnline? '('+esc(p.whereOnline)+')':'')+'</div>' +
+    '<div><strong>Interest:</strong> '+esc(p.interest)+' • <strong>Onboarding:</strong> '+esc(p.onboarding)+'</div>' +
+    (p.challenges? '<div><strong>Challenges:</strong> '+esc(p.challenges)+'</div>':'') +
+    (p.comments? '<div><strong>Marketer comments:</strong> '+esc(p.comments)+'</div>':'');
   document.getElementById('detailDlg').showModal();
 }
 
 // Save / Submit
-document.getElementById('saveBtn').addEventListener('click', async (ev)=>{
+document.getElementById('saveBtn').addEventListener('click', async function(ev){
   const btn = ev.currentTarget;
   const payload = getPayload();
   if (!validate(payload)) return;
   btn.disabled = true; const original = btn.textContent; btn.textContent = 'Saving…';
   saveLocal(payload);
   const images = await filesToBase64List(document.getElementById('images'));
-  try { await postViaProxy(payload, images); toast('Saved and synced ✓', true); btn.textContent = 'Saved ✓'; setTimeout(()=> btn.textContent = original, 900); }
-  catch (e){ queue({ payload, images }); console.error('Sync failed:', e); toast('Saved locally. ' + e.message, false); btn.textContent = 'Queued ⟳'; setTimeout(()=> btn.textContent = original, 1400); }
+  try { await postViaProxy(payload, images); toast('Saved and synced ✓', true); btn.textContent = 'Saved ✓'; setTimeout(function(){ btn.textContent = original; }, 900); }
+  catch (e){ queue({ payload: payload, images: images }); console.error('Sync failed:', e); toast('Saved locally. ' + e.message, false); btn.textContent = 'Queued ⟳'; setTimeout(function(){ btn.textContent = original; }, 1400); }
   finally { btn.disabled = false; }
   renderList();
 });
 
 // Records tools
-document.getElementById('exportCSV').addEventListener('click', ()=>{
+document.getElementById('exportCSV').addEventListener('click', function(){
   const items = allLocal();
   const rows = [[
     "ID","Marketer's Name","Marketer Phone","Marketer Email","Vendor/Business Name","Contact Person Name",
     "Vendor Phone","Vendor Email","Business Address","Category","Sells Online","Where",
     "Interest","Onboarding","Challenges","Comments","Device"
   ]];
-  items.forEach(p=> rows.push([p.id,p.marketerName,p.marketerPhone,p.marketerEmail,p.vendorName,p.contactPerson,p.vendorPhone,p.vendorEmail,p.businessAddress,p.category,p.sellsOnline,p.whereOnline,p.interest,p.onboarding,(p.challenges||'').replace(/\n/g,' '),(p.comments||'').replace(/\n/g,' '),p.device]));
-  const csv = rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  items.forEach(function(p){
+    rows.push([p.id,p.marketerName,p.marketerPhone,p.marketerEmail,p.vendorName,p.contactPerson,p.vendorPhone,p.vendorEmail,p.businessAddress,p.category,p.sellsOnline,p.whereOnline,p.interest,p.onboarding,(p.challenges||'').replace(/\n/g,' '),(p.comments||'').replace(/\n/g,' '),p.device]);
+  });
+  const csv = rows.map(function(r){ return r.map(function(v){ return '"' + String(v).replace(/"/g,'""') + '"'; }).join(','); }).join('\n');
   const blob = new Blob([csv], {type:'text/csv'}); const a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = 'jm-sourcing-records.csv'; document.body.appendChild(a); a.click(); a.remove();
 });
 
-document.getElementById('syncNow').addEventListener('click', (e)=>{ e.preventDefault(); flushQueue(); });
+document.getElementById('syncNow').addEventListener('click', function(e){ e.preventDefault(); flushQueue(); });
 document.getElementById('fText').addEventListener('input', renderList);
-document.getElementById('doSearch').addEventListener('click', (e)=>{ e.preventDefault(); renderList(); });
+document.getElementById('doSearch').addEventListener('click', function(e){ e.preventDefault(); renderList(); });
 
 // Select / Delete selected
-document.getElementById('toggleSelect').addEventListener('click', ()=>{
+document.getElementById('toggleSelect').addEventListener('click', function(){
   selectMode = !selectMode; selectedIds.clear();
   document.getElementById('toggleSelect').textContent = selectMode ? 'Done selecting' : '☑️ Select';
   renderList();
 });
 
-document.getElementById('deleteSelected').addEventListener('click', async ()=>{
+document.getElementById('deleteSelected').addEventListener('click', async function(){
   if (!selectedIds.size) { alert('No entries selected.'); return; }
   const pin = prompt('Enter Admin PIN to delete selected rows:'); if (!pin) return;
   const ids = Array.from(selectedIds);
@@ -459,20 +501,20 @@ document.getElementById('deleteSelected').addEventListener('click', async ()=>{
   try {
     const res = await fetch('/.netlify/functions/gsheets', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action:'delete', ids, adminPin: pin, token })
+      body: JSON.stringify({ action:'delete', ids: ids, adminPin: pin, token: token })
     });
-    const j = await res.json().catch(()=>({ ok:false, error:'Invalid JSON' }));
+    const j = await res.json().catch(function(){ return { ok:false, error:'Invalid JSON' }; });
     if (!j.ok) throw new Error(j.error || 'Delete failed');
-    ids.forEach(id => localStorage.removeItem('jm:data:'+id));
-    alert(`Deleted ${j.deleted || 0} row(s).`);
+    ids.forEach(function(id){ localStorage.removeItem('jm:data:'+id); });
+    alert('Deleted ' + (j.deleted || 0) + ' row(s).');
     selectedIds.clear(); selectMode = false; document.getElementById('toggleSelect').textContent = '☑️ Select';
     renderList();
   } catch (err) { alert('Delete error: ' + (err.message || err)); }
 });
 
 // Admin dialog (single delete)
-document.getElementById('adminBtn').addEventListener('click', ()=> document.getElementById('adminDlg').showModal());
-document.getElementById('adminDeleteBtn').addEventListener('click', async (e)=>{
+document.getElementById('adminBtn').addEventListener('click', function(){ document.getElementById('adminDlg').showModal(); });
+document.getElementById('adminDeleteBtn').addEventListener('click', async function(e){
   e.preventDefault();
   const id = document.getElementById('adminDeleteId').value.trim();
   const pin = document.getElementById('adminPin').value.trim();
@@ -481,19 +523,19 @@ document.getElementById('adminDeleteBtn').addEventListener('click', async (e)=>{
   try {
     const res = await fetch('/.netlify/functions/gsheets', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action:'delete', id, adminPin: pin, token })
+      body: JSON.stringify({ action:'delete', id: id, adminPin: pin, token: token })
     });
-    const j = await res.json().catch(()=>({ ok:false, error:'Invalid JSON' }));
+    const j = await res.json().catch(function(){ return { ok:false, error:'Invalid JSON' }; });
     if (!j.ok) throw new Error(j.error || 'Delete failed');
     localStorage.removeItem('jm:data:'+id);
-    alert(`Deleted ${j.deleted || 0} row(s).`);
+    alert('Deleted ' + (j.deleted || 0) + ' row(s).');
     document.getElementById('adminDlg').close(); renderList();
   } catch (err) { alert('Delete error: ' + (err.message || err)); }
 });
 
 // Settings
 const settingsDlg = document.getElementById('settingsDlg');
-document.getElementById('settingsBtn').addEventListener('click', ()=>{
+document.getElementById('settingsBtn').addEventListener('click', function(){
   const c = cfg.get();
   document.getElementById('brandInput').value = c.brand;
   document.getElementById('tokenInput').value = c.token;
@@ -502,7 +544,7 @@ document.getElementById('settingsBtn').addEventListener('click', ()=>{
   document.getElementById('defaultMarketerEmail').value = c.defMarketerEmail;
   settingsDlg.showModal();
 });
-document.getElementById('saveSettingsBtn').addEventListener('click', (e)=>{
+document.getElementById('saveSettingsBtn').addEventListener('click', function(e){
   e.preventDefault();
   cfg.set({
     brand: document.getElementById('brandInput').value.trim() || 'JulineMart Vendor Sourcing',
@@ -528,12 +570,12 @@ function showTab(which){
   if (which === 'records'){ tabForm.classList.remove('active'); tabRecords.classList.add('active'); viewForm.classList.add('hidden'); viewRecords.classList.remove('hidden'); renderList(); }
   else { tabRecords.classList.remove('active'); tabForm.classList.add('active'); viewRecords.classList.add('hidden'); viewForm.classList.remove('hidden'); }
 }
-tabForm.addEventListener('click', ()=> showTab('form'));
-tabRecords.addEventListener('click', ()=> showTab('records'));
+tabForm.addEventListener('click', function(){ showTab('form'); });
+tabRecords.addEventListener('click', function(){ showTab('records'); });
 
 function init(){
   applyBrand();
-  if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js')); }
+  if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ navigator.serviceWorker.register('./service-worker.js'); }); }
   if (!localStorage.getItem('jm:cfg:token')) localStorage.setItem('jm:cfg:token', 'JMvSource_92nF7x!qA4pLz#Xt8Kd');
   setNet();
   const c = cfg.get();
@@ -543,8 +585,6 @@ function init(){
   renderList(); flushQueue();
 }
 init();
-</script>
-
 </script>
 </body>
 </html>
