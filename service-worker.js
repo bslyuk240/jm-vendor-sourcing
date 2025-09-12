@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jm-sourcing-full-v11';
+const CACHE_NAME = 'jm-sourcing-full-v13'; // bumped cache name
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   './icons/icon-192.png',
   './icons/icon-512.png'
 ];
+
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
   self.skipWaiting();
