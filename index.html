@@ -329,23 +329,28 @@
       };
     }
 
-    function validate(p){
-      const req = [
-        ['Marketer’s Name', p.marketerName],
-        ['Marketer\\'s Phone', p.marketerPhone],
-        ['Vendor/Business Name', p.vendorName],
-        ['Contact Person Name', p.contactPerson],
-        ['Vendor Phone Number', p.vendorPhone],
-        ['Vendor Email Address', p.vendorEmail],
-        ['Business Address / Location', p.businessAddress],
-        ['Type of Business / Product Category', p.category],
-        ['Does the vendor currently sell online?', p.sellsOnline],
-        ['Has the vendor shown interest in registering?', p.interest],
-        ['Preferred onboarding method', p.onboarding]
-      ];
-      for (const [label, val] of req){ if (!val){ alert('Please fill required field: '+label); return false; } }
-      return true;
-    }
+   <script>
+// replace your existing validate() with this:
+function validate(p){
+  const required = [
+    [`Marketer's Name`,            p.marketerName],
+    [`Marketer's Phone`,           p.marketerPhone],
+    [`Vendor/Business Name`,       p.vendorName],
+    [`Contact Person Name`,        p.contactPerson],
+    [`Vendor Phone Number`,        p.vendorPhone],
+    [`Vendor Email Address`,       p.vendorEmail],
+    [`Business Address / Location`,p.businessAddress],
+    [`Type of Business / Category`,p.category],
+    [`Sells online?`,              p.sellsOnline],
+    [`Interest in registering`,    p.interest],
+    [`Preferred onboarding`,       p.onboarding]
+  ];
+  for (const [label, val] of required) {
+    if (!val) { alert(`Please fill required field: ${label}`); return false; }
+  }
+  return true;
+}
+</script>
 
     function saveLocal(p){ localStorage.setItem(dataKey(p.id), JSON.stringify(p)); }
     function allLocal(){
