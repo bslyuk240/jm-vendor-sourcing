@@ -354,7 +354,7 @@ function queue(item){ const q=JSON.parse(localStorage.getItem(queueKey)||'[]'); 
 async function postViaProxy(payload, images){
   const { token } = cfg.get();
   const ctrl = new AbortController(); const timer = setTimeout(()=> ctrl.abort(), 20000);
-  const res = await fetch('/.netlify/functions/gsheets', {
+  const res = await fetch('/.netlify/functions/vendor-intake', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ token, ...payload, images }),
     signal: ctrl.signal
@@ -499,7 +499,7 @@ document.getElementById('deleteSelected').addEventListener('click', async functi
   const ids = Array.from(selectedIds);
   const token = (localStorage.getItem('jm:cfg:token') || 'JMvSource_92nF7x!qA4pLz#Xt8Kd').trim();
   try {
-    const res = await fetch('/.netlify/functions/gsheets', {
+    const res = await fetch('/.netlify/functions/vendor-intake', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action:'delete', ids: ids, adminPin: pin, token: token })
     });
@@ -521,7 +521,7 @@ document.getElementById('adminDeleteBtn').addEventListener('click', async functi
   if (!id || !pin) { alert('Please enter EntryID and Admin PIN.'); return; }
   const token = (localStorage.getItem('jm:cfg:token') || 'JMvSource_92nF7x!qA4pLz#Xt8Kd').trim();
   try {
-    const res = await fetch('/.netlify/functions/gsheets', {
+    const res = await fetch('/.netlify/functions/vendor-intake', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action:'delete', id: id, adminPin: pin, token: token })
     });
