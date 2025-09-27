@@ -1,153 +1,124 @@
-// netlify/functions/vendor-intake.js
 import { createClient } from '@supabase/supabase-js';
 
-const TOKEN = 'JMvSource_92nF7x!qA4pLz#Xt8Kd';   // must match your client/app
-const ADMIN_PIN = '2048';               // your admin PIN
-const BUCKET = process.env.SUPABASE_BUCKET || 'vendor-images'; // storage bucket name
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY; // must be service role for delete
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function resp(statusCode, body) {
-  return {
-    statusCode,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  };
-}
-
-function parseDataUrl(dataUrl) {
-  // data:[mime];base64,XXXX
-  const m = /^data:(.*?);base64,(.*)$/i.exec(dataUrl || '');
-  if (!m) return null;
-  return { mime: m[1], base64: m[2] };
-}
-
-function requireFields(obj, fields) {
-  const missing = fields.filter(f => !obj[f] || String(obj[f]).trim() === '');
-  if (missing.length) {
-    const msg = `Missing required: ${missing.join(', ')}`;
-    return { ok: false, error: msg, missing };
-  }
-  return { ok: true };
-}
+const TOKEN = 'JMvSource_92nF7x!qA4pLz#Xt8Kd';   // must match your frontend
+const ADMIN_PIN = '2048';                        // update to your chosen PIN
 
 export async function handler(event) {
+  if (event.httpMethod !== 'POST') {
+    return resp(405, { ok: false, error: 'method not allowed' });
+  }
+
+  let body = {};
   try {
-    if (event.httpMethod === 'OPTIONS') return resp(200, {});
-    if (event.httpMethod !== 'POST') return resp(405, { ok:false, error:'method not allowed' });
+    body = JSON.parse(event.body || '{}');
+  } catch (err) {
+    return resp(400, { ok: false, error: 'invalid JSON body' });
+  }
 
-    const body = JSON.parse(event.body || '{}');
-    const action = String(body.action || 'create').toLowerCase();
+  // Check token
+  if (body.token !== TOKEN) {
+    return resp(401, { ok: false, error: 'unauthorized' });
+  }
 
-    // Token check
-    if (body.token !== TOKEN) return resp(401, { ok:false, error:'unauthorized' });
+  const action = (body.action || 'create').toLowerCase();
 
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const serviceRole = process.env.SUPABASE_SERVICE_ROLE;
-    if (!supabaseUrl || !serviceRole) {
-      return resp(500, { ok:false, error:'Missing SUPABASE_URL / SUPABASE_SERVICE_ROLE' });
+  try {
+    // 🔹 Create/save
+    if (action === 'create') {
+      const payload = {
+        entry_id: body.id || crypto.randomUUID(),
+        marketer_name: body.marketerName || '',
+        marketer_phone: body.marketerPhone || '',
+        marketer_email: body.marketerEmail || '',
+        vendor_name: body.vendorName || '',
+        contact_person: body.contactPerson || '',
+        vendor_phone: body.vendorPhone || '',
+        vendor_email: body.vendorEmail || '',
+        business_address: body.businessAddress || '',
+        category: body.category || '',
+        sells_online: body.sellsOnline || '',
+        where_online: body.whereOnline || '',
+        interest: body.interest || '',
+        onboarding: body.onboarding || '',
+        challenges: body.challenges || '',
+        comments: body.comments || '',
+        device: body.device || ''
+      };
+
+      const { data, error } = await supabase
+        .from('vendor_responses')
+        .insert([payload])
+        .select();
+
+      if (error) throw error;
+
+      return resp(200, { ok: true, saved: 1, record: data[0] });
     }
 
-    const supabase = createClient(supabaseUrl, serviceRole);
-
-    // ---- DELETE (Admin) ----
+    // 🔹 Delete
     if (action === 'delete') {
-      if (body.adminPin !== ADMIN_PIN) return resp(401, { ok:false, error:'admin unauthorized' });
-      const ids = Array.isArray(body.ids)
-        ? body.ids.map(x => String(x).trim()).filter(Boolean)
-        : (body.id ? [String(body.id).trim()] : []);
-      if (!ids.length) return resp(400, { ok:false, error:'no ids provided' });
+      if (body.adminPin !== ADMIN_PIN) {
+        return resp(401, { ok: false, error: 'admin unauthorized' });
+      }
 
-      // Delete DB rows
-      const { error: delErr, count } = await supabase
+      const ids = Array.isArray(body.ids)
+        ? body.ids.map(String)
+        : body.id
+        ? [String(body.id)]
+        : [];
+
+      if (!ids.length) {
+        return resp(400, { ok: false, error: 'no ids provided' });
+      }
+
+      // Try by entry_id first
+      let { error: delErr, count } = await supabase
         .from('vendor_responses')
         .delete({ count: 'exact' })
         .in('entry_id', ids);
-      if (delErr) return resp(500, { ok:false, error:String(delErr.message || delErr) });
 
-      // (Optional) Also delete storage folder(s)
-      // NOTE: deleteFolder works by listing and removing each object under path
-      for (const id of ids) {
-        const { data: list, error: listErr } = await supabase.storage.from(BUCKET).list(`${id}`);
-        if (!listErr && list && list.length) {
-          await supabase.storage.from(BUCKET).remove(list.map(o => `${id}/${o.name}`));
-        }
+      // If nothing deleted, try by id (numeric or uuid)
+      if (!delErr && (!count || count === 0)) {
+        const byId = await supabase
+          .from('vendor_responses')
+          .delete({ count: 'exact' })
+          .in('id', ids);
+        delErr = byId.error;
+        count = byId.count;
       }
 
-      return resp(200, { ok:true, deleted: count || 0 });
+      if (delErr) throw delErr;
+
+      return resp(200, { ok: true, deleted: count || 0 });
     }
 
-    // ---- CREATE (default) ----
-    // Minimal server-side validation (match your required fields)
-    const requiredCheck = requireFields(body, ['vendorName', 'marketerName', 'category', 'interest', 'onboarding']);
-    if (!requiredCheck.ok) return resp(400, { ok:false, error: requiredCheck.error, missing: requiredCheck.missing });
+    // 🔹 List (debugging)
+    if (action === 'list') {
+      const { data, error } = await supabase
+        .from('vendor_responses')
+        .select('*')
+        .limit(10);
 
-    const entryId = body.id || crypto.randomUUID(); // use client id or generate
-    const images = Array.isArray(body.images) ? body.images : []; // [{ filename, dataUrl }]
-    const uploadedUrls = [];
+      if (error) throw error;
 
-    // Upload images to Supabase Storage (if provided)
-    if (images.length) {
-      for (const img of images) {
-        if (!img?.filename || !img?.dataUrl) continue;
-        const parsed = parseDataUrl(img.dataUrl);
-        if (!parsed) continue;
-        const filePath = `${entryId}/${img.filename}`; // organize by entry
-        const bytes = Buffer.from(parsed.base64, 'base64');
-
-        // Upload (upsert true to allow replacing same filename)
-        const { error: upErr } = await supabase.storage
-          .from(BUCKET)
-          .upload(filePath, bytes, { contentType: parsed.mime, upsert: true });
-        if (upErr) {
-          // don't fail whole request—just skip this image
-          continue;
-        }
-
-        // Get public URL (bucket should be public)
-        const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
-        if (pub?.publicUrl) uploadedUrls.push(pub.publicUrl);
-      }
+      return resp(200, { ok: true, rows: data });
     }
 
-    // Build DB payload
-    const payload = {
-      entry_id: entryId,
-      marketer_name: body.marketerName || null,
-      marketer_phone: body.marketerPhone || null,
-      marketer_email: body.marketerEmail || null,
-      vendor_name: body.vendorName || null,
-      contact_person: body.contactPerson || null,
-      vendor_phone: body.vendorPhone || null,
-      vendor_email: body.vendorEmail || null,
-      business_address: body.businessAddress || null,
-      category: body.category || null,
-      sells_online: body.sellsOnline || null,
-      where_online: body.whereOnline || null,
-      interest: body.interest || null,
-      onboarding: body.onboarding || null,
-      challenges: body.challenges || null,
-      comments: body.comments || null,
-      device: body.device || null,
-      // store URLs (preferred) or fallback to any provided imageLinks
-      image_links: uploadedUrls.length ? uploadedUrls.join(', ') : (body.imageLinks || null)
-    };
-
-    // Insert
-    const { data, error } = await supabase
-      .from('vendor_responses')
-      .insert([payload])
-      .select('id, created_at');
-
-    if (error) return resp(500, { ok:false, error:String(error.message || error) });
-
-    return resp(200, {
-      ok: true,
-      saved: 1,
-      record: data?.[0] || null,
-      uploaded: uploadedUrls.length,
-      imageUrls: uploadedUrls
-    });
-
+    return resp(400, { ok: false, error: 'unknown action' });
   } catch (err) {
-    return resp(500, { ok:false, error:String(err) });
+    return resp(500, { ok: false, error: String(err) });
   }
+}
+
+// Helper: JSON response
+function resp(status, payload) {
+  return {
+    statusCode: status,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  };
 }
