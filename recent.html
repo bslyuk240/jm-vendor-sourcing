@@ -22,11 +22,13 @@
     th { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
     .right { text-align: right; }
-    .btn { border:0; padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600; }
+    .btn { border:0; padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600; margin-left:4px; }
     .btn-danger { background:#ef4444; color:white; }
+    .btn-view { background:#2563eb; color:white; }
     .toolbar { display:flex; align-items:center; gap:10px; justify-content:space-between; margin-bottom:10px; }
     .search { width: 320px; max-width: 100%; padding: 10px 12px; border-radius: 10px; border:1px solid var(--line); background:#0e1529; color:#e8edf6; }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <div class="max">
@@ -98,6 +100,7 @@
           <td>${cat}</td>
           <td class="mono">${entryId}</td>
           <td class="right">
+            <button class="btn btn-view viewBtn" data-id="${entryId}">View</button>
             <button class="btn btn-danger delBtn" data-id="${entryId}">Delete</button>
           </td>
         </tr>
@@ -126,6 +129,31 @@
           } else {
             alert('Delete failed: ' + out.error);
           }
+        });
+      });
+
+      // wire view (PDF)
+      document.querySelectorAll('.viewBtn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          const rec = ALL_ROWS.find(r => r.entry_id === id);
+          if (!rec) return alert('Record not found in memory.');
+
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+          doc.setFontSize(16);
+          doc.text("Vendor Entry — JulineMart", 14, 20);
+          doc.setFontSize(11);
+
+          let y = 35;
+          for (const [key,val] of Object.entries(rec)) {
+            if (!val) continue;
+            doc.text(`${key}: ${val}`, 14, y);
+            y += 7;
+            if (y > 270) { doc.addPage(); y=20; }
+          }
+
+          doc.save(`vendor-${id}.pdf`);
         });
       });
     }
