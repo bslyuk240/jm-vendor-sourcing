@@ -132,7 +132,7 @@
         });
       });
 
-      // wire view (PDF)
+      // wire view (PDF preview in new tab)
       document.querySelectorAll('.viewBtn').forEach(btn => {
         btn.addEventListener('click', async () => {
           const id = btn.dataset.id;
@@ -153,7 +153,9 @@
             if (y > 270) { doc.addPage(); y=20; }
           }
 
-          doc.save(`vendor-${id}.pdf`);
+          // open in new tab instead of auto-download
+          const blobUrl = doc.output("bloburl");
+          window.open(blobUrl, "_blank");
         });
       });
     }
