@@ -1,5 +1,5 @@
-const CACHE_NAME = 'jm-vendor-v4';
-const URLS_TO_CACHE = ['/', '/index.html'];
+const CACHE_NAME = 'jm-vendor-v6';
+const URLS_TO_CACHE = ['/', '/index.html', '/recent.html'];
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
