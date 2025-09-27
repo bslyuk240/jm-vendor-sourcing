@@ -1,21 +1,21 @@
-const CACHE_NAME = 'jm-sourcing-full-v19';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './service-worker.js',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
-];
+const CACHE_NAME = 'jm-vendor-v4';
+const URLS_TO_CACHE = ['/', '/index.html'];
 
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
+self.addEventListener('install', (event) => {
   self.skipWaiting();
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(URLS_TO_CACHE)));
 });
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.map(k => k !== CACHE_NAME ? caches.delete(k) : null))));
-  self.clients.claim();
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.map(k => (k !== CACHE_NAME ? caches.delete(k) : Promise.resolve())))
+    ).then(() => self.clients.claim())
+  );
 });
-self.addEventListener('fetch', e => {
-  e.respondWith(caches.match(e.request).then(c => c || fetch(e.request)));
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then(resp => resp || fetch(event.request))
+  );
 });
