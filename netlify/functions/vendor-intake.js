@@ -2,7 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const TOKEN = 'JMvSource_92nF7x!qA4pLz#Xt8Kd';   // must match your client/app
-const ADMIN_PIN = 'JM-Admin-2048';               // your admin PIN
+const ADMIN_PIN = '2048';               // your admin PIN
 const BUCKET = process.env.SUPABASE_BUCKET || 'vendor-images'; // storage bucket name
 
 function resp(statusCode, body) {
