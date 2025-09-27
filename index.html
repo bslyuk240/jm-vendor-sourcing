@@ -2,233 +2,191 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>JulineMart Vendor Sourcing</title>
+  <title>JulineMart — New Vendor Entry</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root { color-scheme: light dark; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; padding: 24px; line-height: 1.5; }
-    h1 { margin: 0 0 8px; }
-    .sub { opacity: .75; margin: 0 0 24px; }
-    .card { border: 1px solid rgba(127,127,127,.3); border-radius: 12px; padding: 16px; margin-bottom: 24px; }
-    label { display: block; font-weight: 600; margin-top: 10px; }
-    input, select, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(127,127,127,.35); }
-    textarea { min-height: 80px; }
-    .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .row > div { display: flex; flex-direction: column; }
-    .actions { margin-top: 16px; display: flex; gap: 12px; }
-    button { padding: 10px 14px; border-radius: 10px; border: none; cursor: pointer; }
-    .primary { background: #2563eb; color: white; }
-    .muted { background: #e5e7eb; color: #111827; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 10px; border-bottom: 1px solid rgba(127,127,127,.25); text-align: left; vertical-align: top; }
-    th { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; opacity: .7; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
-    .right { text-align: right; }
-    .pill { display:inline-block; padding:3px 8px; border-radius:999px; background:#eef2ff; color:#1e3a8a; font-size:12px; }
-    @media (max-width: 900px) { .row { grid-template-columns: 1fr; } }
+    :root { color-scheme: light dark; --bg:#0b1020; --card:#111831; --muted:#9aa3b2; --line:#213050; --pri:#4f46e5; --pri-2:#6366f1; --ok:#16a34a; --err:#ef4444; }
+    @media (prefers-color-scheme: light) { :root { --bg:#fbfbfe; --card:#ffffff; --muted:#52607a; --line:#e7eaf0; --pri:#4f46e5; --pri-2:#6366f1; } }
+    *{box-sizing:border-box}
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:var(--bg); color:#e8edf6; }
+    .max { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding: 16px 0 8px; }
+    .brand { font-weight:800; letter-spacing:.3px; font-size: 18px; }
+    nav a { color: #e8edf6; text-decoration:none; opacity:.85; padding:8px 12px; border-radius:10px; }
+    nav a:hover { background: rgba(255,255,255,.06); }
+    .sub { color: var(--muted); margin-top: 4px; }
+    .card { background: var(--card); border:1px solid var(--line); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.15); }
+    h1 { margin: 0 0 6px; font-size: 22px; letter-spacing:.2px; }
+    label { display:block; font-size:13px; color:var(--muted); margin-bottom:6px; }
+    input, select, textarea {
+      width:100%; padding:12px 14px; background:#0e1529; color:#e8edf6;
+      border:1px solid var(--line); border-radius:12px; outline:none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--pri-2); box-shadow: 0 0 0 3px rgba(99,102,241,.2); }
+    textarea { min-height: 90px; resize: vertical; }
+    .grid { display:grid; gap:14px; grid-template-columns: repeat(3,1fr); }
+    @media (max-width: 980px){ .grid{ grid-template-columns:1fr; } }
+    .actions { display:flex; gap:12px; margin-top: 14px; }
+    .btn { border:0; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:600; }
+    .btn-primary { background: linear-gradient(90deg, var(--pri), var(--pri-2)); color:white; }
+    .btn-ghost { background: transparent; color: #e8edf6; border:1px solid var(--line); }
+    .note { margin-top:8px; color:var(--muted); font-size:13px; }
+    .toast { margin-top:12px; padding:10px 12px; border-radius:10px; font-size:14px; display:none; }
+    .toast.ok { background: rgba(22,163,74,.15); border:1px solid rgba(22,163,74,.35); color:#b6f2c7; display:block; }
+    .toast.err{ background: rgba(239,68,68,.15); border:1px solid rgba(239,68,68,.35); color:#ffd1d1; display:block; }
+    footer { margin-top: 36px; color: var(--muted); font-size: 13px; text-align:center; }
+    .link { color:#c7cbff; text-decoration:none; }
+    .link:hover { text-decoration:underline; }
   </style>
 </head>
 <body>
-  <h1>JulineMart Vendor Sourcing</h1>
-  <p class="sub">Submit a new vendor, then manage recent entries below. Images are disabled for now to ensure fast, reliable sync.</p>
+  <div class="max">
+    <header>
+      <div class="brand">JulineMart • Vendor Sourcing</div>
+      <nav>
+        <a href="./index.html">New Entry</a>
+        <a href="./recent.html">Recent Entries</a>
+      </nav>
+    </header>
 
-  <!-- Create / Save -->
-  <section class="card">
-    <h2 style="margin:0 0 10px;">New Vendor Entry</h2>
-    <form id="vendorForm">
-      <div class="row">
-        <div>
-          <label>Marketer Name</label>
-          <input name="marketerName" required />
-        </div>
-        <div>
-          <label>Marketer Phone</label>
-          <input name="marketerPhone" />
-        </div>
-        <div>
-          <label>Marketer Email</label>
-          <input name="marketerEmail" type="email" />
+    <div class="card" style="margin-top:10px;">
+      <h1>New Vendor Entry</h1>
+      <p class="sub">Fill the form below. Images are disabled for now (for reliability).</p>
+
+      <form id="vendorForm" style="margin-top:14px;">
+        <div class="grid">
+          <div>
+            <label>Marketer Name *</label>
+            <input name="marketerName" required />
+          </div>
+          <div>
+            <label>Marketer Phone</label>
+            <input name="marketerPhone" />
+          </div>
+          <div>
+            <label>Marketer Email</label>
+            <input name="marketerEmail" type="email" />
+          </div>
+
+          <div>
+            <label>Vendor/Business Name *</label>
+            <input name="vendorName" required />
+          </div>
+          <div>
+            <label>Contact Person</label>
+            <input name="contactPerson" />
+          </div>
+          <div>
+            <label>Vendor Phone</label>
+            <input name="vendorPhone" />
+          </div>
+
+          <div>
+            <label>Vendor Email</label>
+            <input name="vendorEmail" type="email" />
+          </div>
+          <div>
+            <label>Business Address</label>
+            <input name="businessAddress" />
+          </div>
+          <div>
+            <label>Category *</label>
+            <select name="category" required>
+              <option value="">Select…</option>
+              <option>Accessories</option>
+              <option>Beauty/Cosmetics</option>
+              <option>Electronics</option>
+              <option>Fashion</option>
+              <option>Groceries</option>
+              <option>Home & Living</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Sells Online</label>
+            <select name="sellsOnline">
+              <option value="">Select…</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </div>
+          <div>
+            <label>Where Online</label>
+            <input name="whereOnline" placeholder="Instagram, WhatsApp, Website…" />
+          </div>
+          <div>
+            <label>Interest *</label>
+            <select name="interest" required>
+              <option value="">Select…</option>
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Onboarding *</label>
+            <select name="onboarding" required>
+              <option value="">Select…</option>
+              <option>Self Registration</option>
+              <option>Marketer Assistance</option>
+            </select>
+          </div>
+          <div>
+            <label>Challenges</label>
+            <input name="challenges" />
+          </div>
+          <div>
+            <label>Comments</label>
+            <textarea name="comments"></textarea>
+          </div>
         </div>
 
-        <div>
-          <label>Vendor/Business Name</label>
-          <input name="vendorName" required />
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">Save & Sync</button>
+          <button class="btn btn-ghost" type="button" id="resetBtn">Reset</button>
         </div>
-        <div>
-          <label>Contact Person Name</label>
-          <input name="contactPerson" />
-        </div>
-        <div>
-          <label>Vendor Phone</label>
-          <input name="vendorPhone" />
-        </div>
-
-        <div>
-          <label>Vendor Email</label>
-          <input name="vendorEmail" type="email" />
-        </div>
-        <div>
-          <label>Business Address</label>
-          <input name="businessAddress" />
-        </div>
-        <div>
-          <label>Category</label>
-          <select name="category" required>
-            <option value="">Select…</option>
-            <option>Accessories</option>
-            <option>Beauty/Cosmetics</option>
-            <option>Electronics</option>
-            <option>Fashion</option>
-            <option>Groceries</option>
-            <option>Home & Living</option>
-            <option>Other</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Sells Online</label>
-          <select name="sellsOnline">
-            <option value="">Select…</option>
-            <option>Yes</option>
-            <option>No</option>
-          </select>
-        </div>
-        <div>
-          <label>Where Online</label>
-          <input name="whereOnline" placeholder="Instagram, WhatsApp, Website…" />
-        </div>
-        <div>
-          <label>Interest</label>
-          <select name="interest" required>
-            <option value="">Select…</option>
-            <option>Yes</option>
-            <option>No</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Onboarding</label>
-          <select name="onboarding" required>
-            <option value="">Select…</option>
-            <option>Self Registration</option>
-            <option>Marketer Assistance</option>
-          </select>
-        </div>
-        <div>
-          <label>Challenges</label>
-          <input name="challenges" />
-        </div>
-        <div>
-          <label>Comments</label>
-          <textarea name="comments"></textarea>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="primary" type="submit">Save & Sync</button>
-        <button class="muted" type="button" id="resetBtn">Reset</button>
-      </div>
-    </form>
-  </section>
-
-  <!-- Recent entries -->
-  <section class="card">
-    <div style="display:flex;align-items:center;gap:10px;justify-content:space-between;">
-      <h2 style="margin:0;">Recent Entries</h2>
-      <button class="muted" id="refreshBtn">Refresh</button>
+        <div id="toast" class="toast"></div>
+        <p class="note">Required: fields marked with *.</p>
+      </form>
     </div>
-    <div style="overflow:auto;">
-      <table>
-        <thead>
-          <tr>
-            <th>Vendor</th>
-            <th>Marketer</th>
-            <th>Category</th>
-            <th>Entry ID</th>
-            <th class="right">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="rows">
-          <!-- populated by refreshList() -->
-        </tbody>
-      </table>
-    </div>
-  </section>
+
+    <footer>
+      After saving, open <a class="link" href="./recent.html">Recent Entries</a> to manage/delete.
+    </footer>
+  </div>
 
   <script>
-    // --- Config ---
+    // ---- config
     const TOKEN = 'JMvSource_92nF7x!qA4pLz#Xt8Kd';
     const FN_URL = '/.netlify/functions/vendor-intake';
 
-    // --- Helpers ---
+    function showToast(msg, ok=true) {
+      const el = document.getElementById('toast');
+      el.className = 'toast ' + (ok ? 'ok' : 'err');
+      el.textContent = msg;
+      el.style.display = 'block';
+      setTimeout(()=>{ el.style.display='none'; }, 3000);
+    }
+
     async function api(action, extra = {}) {
       const res = await fetch(FN_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: TOKEN, action, ...extra })
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ token:TOKEN, action, ...extra })
       });
-      const ctype = res.headers.get('content-type') || '';
-      if (ctype.includes('application/json')) return await res.json();
+      const ct = res.headers.get('content-type') || '';
+      if (ct.includes('application/json')) return res.json();
       const txt = await res.text();
-      return { ok:false, error:`Non-JSON ${res.status} ${res.statusText}: ${txt.slice(0,200)}` };
+      return { ok:false, error:`Non-JSON ${res.status}: ${txt.slice(0,200)}` };
     }
 
-    function vendorRowHTML(r) {
-      const entryId = r.entry_id || '';
-      const vendor  = r.vendor_name || '';
-      const marketer= r.marketer_name || '';
-      const cat     = r.category || '';
-      return `
-        <tr data-entry-id="${entryId}">
-          <td>${vendor}</td>
-          <td>${marketer}</td>
-          <td>${cat}</td>
-          <td class="mono">${entryId}</td>
-          <td class="right">
-            <button class="muted delBtn" data-id="${entryId}">Delete</button>
-          </td>
-        </tr>
-      `;
-    }
-
-    async function refreshList() {
-      const out = await api('list');
-      const tbody = document.getElementById('rows');
-      if (!out.ok) {
-        tbody.innerHTML = `<tr><td colspan="5">Error: ${out.error}</td></tr>`;
-        return;
-      }
-      if (!out.rows || out.rows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="opacity:.7;">No entries found.</td></tr>`;
-        return;
-      }
-      // Newest first
-      const rows = [...out.rows].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-      tbody.innerHTML = rows.map(vendorRowHTML).join('');
-      // wire delete buttons
-      document.querySelectorAll('.delBtn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          const id = btn.dataset.id;
-          if (!id) return alert('Missing entry_id on row.');
-          if (!confirm(`Delete entry ${id}?`)) return;
-          const del = await api('delete', { id });
-          if (del.ok) {
-            btn.closest('tr')?.remove();
-            alert(`Deleted ${del.deleted} record(s).`);
-          } else {
-            alert('Delete failed: ' + del.error);
-          }
-        });
-      });
-    }
-
-    // --- Form submit (create) ---
-    document.getElementById('vendorForm').addEventListener('submit', async (e) => {
+    document.getElementById('vendorForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
       const f = e.target;
 
       const payload = {
-        id: crypto.randomUUID(), // entry_id we will save
+        id: crypto.randomUUID(), // entry_id we save in DB
         marketerName: f.marketerName.value.trim(),
         marketerPhone: f.marketerPhone.value.trim(),
         marketerEmail: f.marketerEmail.value.trim(),
@@ -249,36 +207,27 @@
 
       // minimal client validation
       if (!payload.vendorName || !payload.marketerName || !payload.category || !payload.interest || !payload.onboarding) {
-        alert('Please fill required fields (Vendor, Marketer, Category, Interest, Onboarding).');
+        showToast('Fill required fields (Vendor, Marketer, Category, Interest, Onboarding).', false);
         return;
       }
 
       const out = await api('create', payload);
       if (out.ok) {
-        alert('Saved & synced ✓');
         f.reset();
-        refreshList();
+        showToast('Saved & synced ✓', true);
       } else {
-        alert('Save failed: ' + out.error);
+        showToast('Save failed: ' + out.error, false);
       }
     });
 
-    // Reset button
-    document.getElementById('resetBtn').addEventListener('click', () => {
+    document.getElementById('resetBtn').addEventListener('click', ()=> {
       document.getElementById('vendorForm').reset();
     });
 
-    // Refresh button
-    document.getElementById('refreshBtn').addEventListener('click', refreshList);
-
-    // Initial load
-    document.addEventListener('DOMContentLoaded', () => {
-      refreshList();
-      // Register (or bump) service worker to avoid stale HTML
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js?v=4').catch(()=>{});
-      }
-    });
+    // service worker bump to avoid stale cache
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js?v=6').catch(()=>{});
+    }
   </script>
 </body>
 </html>
