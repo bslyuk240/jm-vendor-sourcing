@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>JulineMart — Recent Entries</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { color-scheme: light dark; --bg:#0b1020; --card:#111831; --muted:#9aa3b2; --line:#213050; --pri:#4f46e5; --pri-2:#6366f1; }
+    @media (prefers-color-scheme: light) { :root { --bg:#fbfbfe; --card:#ffffff; --muted:#52607a; --line:#e7eaf0; --pri:#4f46e5; --pri-2:#6366f1; } }
+    *{box-sizing:border-box}
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:var(--bg); color:#e8edf6; }
+    .max { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding: 16px 0 8px; }
+    .brand { font-weight:800; letter-spacing:.3px; font-size: 18px; }
+    nav a { color: #e8edf6; text-decoration:none; opacity:.85; padding:8px 12px; border-radius:10px; }
+    nav a:hover { background: rgba(255,255,255,.06); }
+    .card { background: var(--card); border:1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.15); }
+    h1 { margin: 0 0 6px; font-size: 22px; }
+    .sub { color: var(--muted); margin: 0 0 12px; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { padding: 11px 10px; border-bottom: 1px solid var(--line); text-align:left; vertical-align: top; }
+    th { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+    .right { text-align: right; }
+    .btn { border:0; padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600; }
+    .btn-danger { background:#ef4444; color:white; }
+    .toolbar { display:flex; align-items:center; gap:10px; justify-content:space-between; margin-bottom:10px; }
+    .search { width: 320px; max-width: 100%; padding: 10px 12px; border-radius: 10px; border:1px solid var(--line); background:#0e1529; color:#e8edf6; }
+  </style>
+</head>
+<body>
+  <div class="max">
+    <header>
+      <div class="brand">JulineMart • Vendor Sourcing</div>
+      <nav>
+        <a href="./index.html">New Entry</a>
+        <a href="./recent.html">Recent Entries</a>
+      </nav>
+    </header>
+
+    <section class="card" style="margin-top:10px;">
+      <div class="toolbar">
+        <div>
+          <h1 style="margin:0;">Recent Entries</h1>
+          <p class="sub" id="countSub">Loading…</p>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input id="search" class="search" placeholder="Search vendor, marketer or entry_id…" />
+          <button class="btn" id="refreshBtn">Refresh</button>
+        </div>
+      </div>
+
+      <div style="overflow:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Vendor</th>
+              <th>Marketer</th>
+              <th>Category</th>
+              <th>Entry ID</th>
+              <th class="right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rows">
+            <tr><td colspan="5" style="opacity:.7;">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const TOKEN = 'JMvSource_92nF7x!qA4pLz#Xt8Kd';
+    const FN_URL = '/.netlify/functions/vendor-intake';
+    let ALL_ROWS = [];
+
+    async function api(action, extra={}) {
+      const res = await fetch(FN_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ token:TOKEN, action, ...extra })
+      });
+      const ct = res.headers.get('content-type') || '';
+      if (ct.includes('application/json')) return res.json();
+      const txt = await res.text();
+      return { ok:false, error:`Non-JSON ${res.status} ${res.statusText}: ${txt.slice(0,200)}` };
+    }
+
+    function rowHTML(r) {
+      const entryId = r.entry_id || '';
+      const vendor = r.vendor_name || '';
+      const marketer = r.marketer_name || '';
+      const cat = r.category || '';
+      return `
+        <tr data-entry-id="${entryId}">
+          <td>${vendor}</td>
+          <td>${marketer}</td>
+          <td>${cat}</td>
+          <td class="mono">${entryId}</td>
+          <td class="right">
+            <button class="btn btn-danger delBtn" data-id="${entryId}">Delete</button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function render(rows) {
+      const tbody = document.getElementById('rows');
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="opacity:.7;">No entries.</td></tr>`;
+        document.getElementById('countSub').textContent = '0 entries';
+        return;
+      }
+      tbody.innerHTML = rows.map(rowHTML).join('');
+      document.getElementById('countSub').textContent = `${rows.length} entr${rows.length===1?'y':'ies'}`;
+
+      // wire delete
+      document.querySelectorAll('.delBtn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          if (!id) return alert('Missing entry_id on row.');
+          if (!confirm(`Delete entry ${id}?`)) return;
+          const out = await api('delete', { id });
+          if (out.ok) {
+            btn.closest('tr')?.remove();
+          } else {
+            alert('Delete failed: ' + out.error);
+          }
+        });
+      });
+    }
+
+    async function load() {
+      const out = await api('list');
+      if (!out.ok) {
+        document.getElementById('rows').innerHTML = `<tr><td colspan="5">Error: ${out.error}</td></tr>`;
+        document.getElementById('countSub').textContent = 'Error';
+        return;
+      }
+      ALL_ROWS = [...out.rows].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+      render(ALL_ROWS);
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', load);
+    document.getElementById('search').addEventListener('input', (e)=>{
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) return render(ALL_ROWS);
+      const filtered = ALL_ROWS.filter(r =>
+        (r.vendor_name||'').toLowerCase().includes(q) ||
+        (r.marketer_name||'').toLowerCase().includes(q) ||
+        (r.entry_id||'').toLowerCase().includes(q)
+      );
+      render(filtered);
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      load();
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js?v=6').catch(()=>{});
+      }
+    });
+  </script>
+</body>
+</html>
