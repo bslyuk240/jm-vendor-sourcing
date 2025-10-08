@@ -46,7 +46,7 @@
     }
     
     .container { 
-      max-width: 1200px; 
+      max-width: 1400px; 
       margin: 0 auto; 
       padding: 2rem 1.5rem;
       min-height: 100vh;
@@ -131,17 +131,27 @@
       background: linear-gradient(90deg, var(--purple) 0%, var(--orange) 100%);
     }
     
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
     h1 { 
       font-size: 2rem; 
       font-weight: 700;
       color: var(--purple-dark);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
     }
     
     .subtitle { 
       color: var(--text-secondary); 
+      font-size: 0.95rem;
       margin-bottom: 2rem;
-      font-size: 1rem;
     }
     
     /* Form */
@@ -303,11 +313,12 @@
     }
     
     /* Responsive */
-    @media (max-width: 768px) { 
+    @media (max-width: 968px) { 
       .container { padding: 1rem; }
       header { padding: 1.5rem; }
       .header-content { flex-direction: column; }
       .card { padding: 1.5rem; }
+      .toolbar { flex-direction: column; align-items: stretch; }
       .form-grid { grid-template-columns: 1fr; }
       .form-actions { flex-direction: column; }
       .btn { width: 100%; }
@@ -330,8 +341,12 @@
     </header>
 
     <div class="card">
-      <h1>New Vendor Entry</h1>
-      <p class="subtitle">Complete the form below to add a new vendor to the system</p>
+      <div class="toolbar">
+        <div>
+          <h1>New Vendor Entry</h1>
+          <p class="subtitle">Complete the form below to add a new vendor to the system</p>
+        </div>
+      </div>
 
       <form id="vendorForm">
         <div class="form-grid">
