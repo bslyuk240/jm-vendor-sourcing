@@ -5,38 +5,448 @@
   <title>JulineMart — New Vendor Entry</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root { color-scheme: light dark; --bg:#0b1020; --card:#111831; --muted:#9aa3b2; --line:#213050; --pri:#4f46e5; --pri-2:#6366f1; --ok:#16a34a; --err:#ef4444; }
-    @media (prefers-color-scheme: light) { :root { --bg:#fbfbfe; --card:#ffffff; --muted:#52607a; --line:#e7eaf0; --pri:#4f46e5; --pri-2:#6366f1; } }
-    *{box-sizing:border-box}
-    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:var(--bg); color:#e8edf6; }
-    .max { max-width: 1100px; margin: 0 auto; padding: 24px; }
-    header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding: 16px 0 8px; }
-    .brand { font-weight:800; letter-spacing:.3px; font-size: 18px; }
-    nav a { color: #e8edf6; text-decoration:none; opacity:.85; padding:8px 12px; border-radius:10px; }
-    nav a:hover { background: rgba(255,255,255,.06); }
-    .sub { color: var(--muted); margin-top: 4px; }
-    .card { background: var(--card); border:1px solid var(--line); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.15); }
-    h1 { margin: 0 0 6px; font-size: 22px; letter-spacing:.2px; }
-    label { display:block; font-size:13px; color:var(--muted); margin-bottom:6px; }
-    input, select, textarea {
-      width:100%; padding:12px 14px; background:#0e1529; color:#e8edf6;
-      border:1px solid var(--line); border-radius:12px; outline:none;
+    :root { 
+      color-scheme: light dark;
+      /* Dark theme colors */
+      --bg: #0a0a0f;
+      --bg-secondary: #111118;
+      --card: #1a1a24;
+      --card-hover: #21212f;
+      --surface: #2a2a3a;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --border-subtle: #1e293b;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-light: rgba(59, 130, 246, 0.1);
+      --success: #22c55e;
+      --success-light: rgba(34, 197, 94, 0.15);
+      --error: #ef4444;
+      --error-light: rgba(239, 68, 68, 0.15);
+      --warning: #f59e0b;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.4);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    input:focus, select:focus, textarea:focus { border-color: var(--pri-2); box-shadow: 0 0 0 3px rgba(99,102,241,.2); }
-    textarea { min-height: 90px; resize: vertical; }
-    .grid { display:grid; gap:14px; grid-template-columns: repeat(3,1fr); }
-    @media (max-width: 980px){ .grid{ grid-template-columns:1fr; } }
-    .actions { display:flex; gap:12px; margin-top: 14px; }
-    .btn { border:0; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:600; }
-    .btn-primary { background: linear-gradient(90deg, var(--pri), var(--pri-2)); color:white; }
-    .btn-ghost { background: transparent; color: #e8edf6; border:1px solid var(--line); }
-    .note { margin-top:8px; color:var(--muted); font-size:13px; }
-    .toast { margin-top:12px; padding:10px 12px; border-radius:10px; font-size:14px; display:none; }
-    .toast.ok { background: rgba(22,163,74,.15); border:1px solid rgba(22,163,74,.35); color:#b6f2c7; display:block; }
-    .toast.err{ background: rgba(239,68,68,.15); border:1px solid rgba(239,68,68,.35); color:#ffd1d1; display:block; }
-    footer { margin-top: 36px; color: var(--muted); font-size: 13px; text-align:center; }
-    .link { color:#c7cbff; text-decoration:none; }
-    .link:hover { text-decoration:underline; }
+    
+    @media (prefers-color-scheme: light) { 
+      :root { 
+        --bg: #ffffff;
+        --bg-secondary: #f8fafc;
+        --card: #ffffff;
+        --card-hover: #f1f5f9;
+        --surface: #f8fafc;
+        --text-primary: #0f172a;
+        --text-secondary: #334155;
+        --text-muted: #64748b;
+        --border: #e2e8f0;
+        --border-subtle: #f1f5f9;
+        --accent: #3b82f6;
+        --accent-hover: #2563eb;
+        --accent-light: rgba(59, 130, 246, 0.08);
+        --success: #16a34a;
+        --success-light: rgba(22, 163, 74, 0.1);
+        --error: #dc2626;
+        --error-light: rgba(220, 38, 38, 0.1);
+        --warning: #d97706;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.15);
+      } 
+    }
+    
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    
+    body { 
+      margin: 0; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .max { 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      padding: 2rem 1.5rem;
+      min-height: 100vh;
+    }
+    
+    header { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      gap: 1rem; 
+      padding: 1rem 0 2rem;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 2rem;
+    }
+    
+    .brand { 
+      font-weight: 700; 
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+    
+    nav {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 0.25rem;
+    }
+    
+    nav a { 
+      color: var(--text-secondary); 
+      text-decoration: none; 
+      padding: 0.75rem 1.25rem; 
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      position: relative;
+    }
+    
+    nav a:hover, nav a.active { 
+      background: var(--accent);
+      color: white;
+      transform: translateY(-1px);
+    }
+    
+    .sub { 
+      color: var(--text-muted); 
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    
+    .card { 
+      background: var(--card); 
+      border: 1px solid var(--border-subtle); 
+      border-radius: var(--radius-lg); 
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+    }
+    
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+    
+    h1 { 
+      margin: 0 0 0.5rem; 
+      font-size: 1.75rem; 
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+    
+    .form-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+    
+    label { 
+      display: block; 
+      font-size: 0.875rem; 
+      color: var(--text-secondary); 
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    input, select, textarea {
+      width: 100%; 
+      padding: 1rem 1rem; 
+      background: var(--surface);
+      color: var(--text-primary);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      outline: none;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: var(--transition);
+      position: relative;
+    }
+    
+    input:focus, select:focus, textarea:focus { 
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+      transform: translateY(-1px);
+    }
+    
+    input:hover, select:hover, textarea:hover {
+      border-color: var(--text-muted);
+    }
+    
+    textarea { 
+      min-height: 120px; 
+      resize: vertical;
+      font-family: inherit;
+      line-height: 1.5;
+    }
+    
+    .grid { 
+      display: grid; 
+      gap: 1.5rem; 
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      margin-bottom: 2rem;
+    }
+    
+    @media (max-width: 768px) { 
+      .grid { 
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+      
+      .max {
+        padding: 1rem;
+      }
+      
+      header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+      }
+      
+      nav {
+        justify-content: center;
+      }
+      
+      .card {
+        padding: 1.5rem;
+      }
+    }
+    
+    .actions { 
+      display: flex; 
+      gap: 1rem; 
+      margin-top: 2rem;
+      justify-content: flex-end;
+    }
+    
+    @media (max-width: 640px) {
+      .actions {
+        flex-direction: column;
+      }
+    }
+    
+    .btn { 
+      border: 0; 
+      padding: 0.875rem 2rem; 
+      border-radius: var(--radius-md); 
+      cursor: pointer; 
+      font-weight: 600;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      min-width: 120px;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.6s;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn-primary { 
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover)); 
+      color: white;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-ghost { 
+      background: transparent; 
+      color: var(--text-secondary); 
+      border: 2px solid var(--border);
+    }
+    
+    .btn-ghost:hover {
+      background: var(--surface);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .note { 
+      margin-top: 1rem; 
+      color: var(--text-muted); 
+      font-size: 0.875rem;
+      font-style: italic;
+    }
+    
+    .toast { 
+      margin-top: 1.5rem; 
+      padding: 1rem 1.25rem; 
+      border-radius: var(--radius-md); 
+      font-size: 0.95rem; 
+      display: none;
+      font-weight: 500;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(-10px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .toast.ok { 
+      background: var(--success-light); 
+      border: 1px solid var(--success); 
+      color: var(--success); 
+      display: block;
+    }
+    
+    .toast.err { 
+      background: var(--error-light); 
+      border: 1px solid var(--error); 
+      color: var(--error); 
+      display: block;
+    }
+    
+    footer { 
+      margin-top: 3rem; 
+      color: var(--text-muted); 
+      font-size: 0.875rem; 
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+    
+    .link { 
+      color: var(--accent); 
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .link:hover { 
+      color: var(--accent-hover);
+      text-decoration: underline;
+    }
+    
+    /* Loading states and animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .loading {
+      animation: pulse 2s infinite;
+    }
+    
+    /* Focus management for accessibility */
+    .btn:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    
+    /* Form validation styles */
+    input:invalid, select:invalid, textarea:invalid {
+      border-color: var(--error);
+    }
+    
+    input:invalid:focus, select:invalid:focus, textarea:invalid:focus {
+      box-shadow: 0 0 0 3px var(--error-light);
+    }
+    
+    /* Loading button state */
+    .btn.loading {
+      opacity: 0.7;
+      cursor: not-allowed;
+      position: relative;
+    }
+    
+    .btn.loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 16px;
+      height: 16px;
+      margin: -8px 0 0 -8px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Smooth scroll behavior */
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      :root {
+        --border: #000000;
+        --text-muted: #333333;
+      }
+      
+      @media (prefers-color-scheme: light) {
+        :root {
+          --border: #000000;
+          --text-muted: #333333;
+        }
+      }
+    }
   </style>
 </head>
 <body>
@@ -44,7 +454,7 @@
     <header>
       <div class="brand">JulineMart • Vendor Sourcing</div>
       <nav>
-        <a href="./index.html">New Entry</a>
+        <a href="./index.html" class="active">New Entry</a>
         <a href="./recent.html">Recent Entries</a>
       </nav>
     </header>
@@ -55,41 +465,41 @@
 
       <form id="vendorForm" style="margin-top:14px;">
         <div class="grid">
-          <div>
+          <div class="form-group">
             <label>Marketer Name *</label>
             <input name="marketerName" required />
           </div>
-          <div>
+          <div class="form-group">
             <label>Marketer Phone</label>
             <input name="marketerPhone" />
           </div>
-          <div>
+          <div class="form-group">
             <label>Marketer Email</label>
             <input name="marketerEmail" type="email" />
           </div>
 
-          <div>
+          <div class="form-group">
             <label>Vendor/Business Name *</label>
             <input name="vendorName" required />
           </div>
-          <div>
+          <div class="form-group">
             <label>Contact Person</label>
             <input name="contactPerson" />
           </div>
-          <div>
+          <div class="form-group">
             <label>Vendor Phone</label>
             <input name="vendorPhone" />
           </div>
 
-          <div>
+          <div class="form-group">
             <label>Vendor Email</label>
             <input name="vendorEmail" type="email" />
           </div>
-          <div>
+          <div class="form-group">
             <label>Business Address</label>
             <input name="businessAddress" />
           </div>
-          <div>
+          <div class="form-group">
             <label>Category *</label>
             <select name="category" required>
               <option value="">Select…</option>
@@ -103,7 +513,7 @@
             </select>
           </div>
 
-          <div>
+          <div class="form-group">
             <label>Sells Online</label>
             <select name="sellsOnline">
               <option value="">Select…</option>
@@ -111,11 +521,11 @@
               <option>No</option>
             </select>
           </div>
-          <div>
+          <div class="form-group">
             <label>Where Online</label>
             <input name="whereOnline" placeholder="Instagram, WhatsApp, Website…" />
           </div>
-          <div>
+          <div class="form-group">
             <label>Interest *</label>
             <select name="interest" required>
               <option value="">Select…</option>
@@ -124,7 +534,7 @@
             </select>
           </div>
 
-          <div>
+          <div class="form-group">
             <label>Onboarding *</label>
             <select name="onboarding" required>
               <option value="">Select…</option>
@@ -132,11 +542,11 @@
               <option>Marketer Assistance</option>
             </select>
           </div>
-          <div>
+          <div class="form-group">
             <label>Challenges</label>
             <input name="challenges" />
           </div>
-          <div>
+          <div class="form-group">
             <label>Comments</label>
             <textarea name="comments"></textarea>
           </div>
@@ -184,6 +594,13 @@
     document.getElementById('vendorForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
       const f = e.target;
+      const submitBtn = f.querySelector('.btn-primary');
+      
+      // Add loading state
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Saving...';
 
       const payload = {
         id: crypto.randomUUID(), // entry_id we save in DB
@@ -208,10 +625,20 @@
       // minimal client validation
       if (!payload.vendorName || !payload.marketerName || !payload.category || !payload.interest || !payload.onboarding) {
         showToast('Fill required fields (Vendor, Marketer, Category, Interest, Onboarding).', false);
+        // Reset button state
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
         return;
       }
 
       const out = await api('create', payload);
+      
+      // Reset button state
+      submitBtn.classList.remove('loading');
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+      
       if (out.ok) {
         f.reset();
         showToast('Saved & synced ✓', true);
