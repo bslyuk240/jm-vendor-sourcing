@@ -5,28 +5,422 @@
   <title>JulineMart — Recent Entries</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root { color-scheme: light dark; --bg:#0b1020; --card:#111831; --muted:#9aa3b2; --line:#213050; --pri:#4f46e5; --pri-2:#6366f1; }
-    @media (prefers-color-scheme: light) { :root { --bg:#fbfbfe; --card:#ffffff; --muted:#52607a; --line:#e7eaf0; --pri:#4f46e5; --pri-2:#6366f1; } }
-    *{box-sizing:border-box}
-    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:var(--bg); color:#e8edf6; }
-    .max { max-width: 1100px; margin: 0 auto; padding: 24px; }
-    header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding: 16px 0 8px; }
-    .brand { font-weight:800; letter-spacing:.3px; font-size: 18px; }
-    nav a { color: #e8edf6; text-decoration:none; opacity:.85; padding:8px 12px; border-radius:10px; }
-    nav a:hover { background: rgba(255,255,255,.06); }
-    .card { background: var(--card); border:1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.15); }
-    h1 { margin: 0 0 6px; font-size: 22px; }
-    .sub { color: var(--muted); margin: 0 0 12px; }
-    table { width:100%; border-collapse: collapse; }
-    th, td { padding: 11px 10px; border-bottom: 1px solid var(--line); text-align:left; vertical-align: top; }
-    th { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
-    .right { text-align: right; }
-    .btn { border:0; padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600; margin-left:4px; }
-    .btn-danger { background:#ef4444; color:white; }
-    .btn-view { background:#2563eb; color:white; }
-    .toolbar { display:flex; align-items:center; gap:10px; justify-content:space-between; margin-bottom:10px; }
-    .search { width: 320px; max-width: 100%; padding: 10px 12px; border-radius: 10px; border:1px solid var(--line); background:#0e1529; color:#e8edf6; }
+    :root { 
+      color-scheme: light dark;
+      /* Dark theme colors */
+      --bg: #0a0a0f;
+      --bg-secondary: #111118;
+      --card: #1a1a24;
+      --card-hover: #21212f;
+      --surface: #2a2a3a;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --border-subtle: #1e293b;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-light: rgba(59, 130, 246, 0.1);
+      --success: #22c55e;
+      --success-light: rgba(34, 197, 94, 0.15);
+      --error: #ef4444;
+      --error-light: rgba(239, 68, 68, 0.15);
+      --warning: #f59e0b;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.4);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    @media (prefers-color-scheme: light) { 
+      :root { 
+        --bg: #ffffff;
+        --bg-secondary: #f8fafc;
+        --card: #ffffff;
+        --card-hover: #f1f5f9;
+        --surface: #f8fafc;
+        --text-primary: #0f172a;
+        --text-secondary: #334155;
+        --text-muted: #64748b;
+        --border: #e2e8f0;
+        --border-subtle: #f1f5f9;
+        --accent: #3b82f6;
+        --accent-hover: #2563eb;
+        --accent-light: rgba(59, 130, 246, 0.08);
+        --success: #16a34a;
+        --success-light: rgba(22, 163, 74, 0.1);
+        --error: #dc2626;
+        --error-light: rgba(220, 38, 38, 0.1);
+        --warning: #d97706;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.15);
+      } 
+    }
+    
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    
+    body { 
+      margin: 0; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .max { 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      padding: 2rem 1.5rem;
+      min-height: 100vh;
+    }
+    
+    header { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      gap: 1rem; 
+      padding: 1rem 0 2rem;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 2rem;
+    }
+    
+    .brand { 
+      font-weight: 700; 
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+    
+    nav {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 0.25rem;
+    }
+    
+    nav a { 
+      color: var(--text-secondary); 
+      text-decoration: none; 
+      padding: 0.75rem 1.25rem; 
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      position: relative;
+    }
+    
+    nav a:hover, nav a.active { 
+      background: var(--accent);
+      color: white;
+      transform: translateY(-1px);
+    }
+    
+    .card { 
+      background: var(--card); 
+      border: 1px solid var(--border-subtle); 
+      border-radius: var(--radius-lg); 
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+    }
+    
+    h1 { 
+      margin: 0 0 0.5rem; 
+      font-size: 1.75rem; 
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+    
+    .sub { 
+      color: var(--text-muted); 
+      margin: 0 0 1.5rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    
+    .toolbar { 
+      display: flex; 
+      align-items: flex-start; 
+      gap: 1.5rem; 
+      justify-content: space-between; 
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .toolbar-left h1 {
+      margin-bottom: 0.25rem;
+    }
+    
+    .toolbar-right {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .search { 
+      width: 320px; 
+      max-width: 100%; 
+      padding: 0.75rem 1rem; 
+      border-radius: var(--radius-md); 
+      border: 2px solid var(--border); 
+      background: var(--surface); 
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+    
+    .search:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+      outline: none;
+    }
+    
+    .search:hover {
+      border-color: var(--text-muted);
+    }
+    
+    .btn { 
+      border: 0; 
+      padding: 0.75rem 1.5rem; 
+      border-radius: var(--radius-md); 
+      cursor: pointer; 
+      font-weight: 600;
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.6s;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+    
+    .btn-danger { 
+      background: var(--error); 
+      color: white;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-danger:hover {
+      background: #dc2626;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-view { 
+      background: var(--accent); 
+      color: white;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-view:hover {
+      background: var(--accent-hover);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .btn-refresh {
+      background: var(--surface);
+      color: var(--text-secondary);
+      border: 2px solid var(--border);
+    }
+    
+    .btn-refresh:hover {
+      background: var(--card-hover);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .table-container {
+      overflow: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      margin-top: 1rem;
+    }
+    
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      background: var(--card);
+    }
+    
+    th, td { 
+      padding: 1rem; 
+      border-bottom: 1px solid var(--border-subtle); 
+      text-align: left; 
+      vertical-align: middle;
+    }
+    
+    th { 
+      font-size: 0.8rem; 
+      text-transform: uppercase; 
+      letter-spacing: 0.05em; 
+      color: var(--text-muted); 
+      background: var(--surface);
+      font-weight: 600;
+      border-bottom: 2px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    
+    td {
+      font-size: 0.9rem;
+    }
+    
+    tr:hover td {
+      background: var(--surface);
+    }
+    
+    tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .mono { 
+      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace; 
+      font-size: 0.8rem;
+      background: var(--surface);
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+    }
+    
+    .right { 
+      text-align: right;
+    }
+    
+    .actions-cell {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    
+    .actions-cell .btn {
+      padding: 0.5rem 0.875rem;
+      font-size: 0.8rem;
+    }
+    
+    @media (max-width: 768px) { 
+      .max {
+        padding: 1rem;
+      }
+      
+      header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+      }
+      
+      nav {
+        justify-content: center;
+      }
+      
+      .card {
+        padding: 1.5rem;
+      }
+      
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+      }
+      
+      .toolbar-right {
+        justify-content: stretch;
+        flex-direction: column;
+      }
+      
+      .search {
+        width: 100%;
+      }
+      
+      .table-container {
+        font-size: 0.85rem;
+      }
+      
+      th, td {
+        padding: 0.75rem 0.5rem;
+      }
+      
+      .actions-cell {
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+      
+      .actions-cell .btn {
+        width: 100%;
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+      }
+    }
+    
+    /* Loading states and animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .loading {
+      animation: pulse 2s infinite;
+    }
+    
+    /* Focus management for accessibility */
+    .btn:focus-visible,
+    .search:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
@@ -36,23 +430,23 @@
       <div class="brand">JulineMart • Vendor Sourcing</div>
       <nav>
         <a href="./index.html">New Entry</a>
-        <a href="./recent.html">Recent Entries</a>
+        <a href="./recent.html" class="active">Recent Entries</a>
       </nav>
     </header>
 
     <section class="card" style="margin-top:10px;">
       <div class="toolbar">
-        <div>
+        <div class="toolbar-left">
           <h1 style="margin:0;">Recent Entries</h1>
           <p class="sub" id="countSub">Loading…</p>
         </div>
-        <div style="display:flex; gap:8px; align-items:center;">
+        <div class="toolbar-right">
           <input id="search" class="search" placeholder="Search vendor, marketer or entry_id…" />
-          <button class="btn" id="refreshBtn">Refresh</button>
+          <button class="btn btn-refresh" id="refreshBtn">Refresh</button>
         </div>
       </div>
 
-      <div style="overflow:auto;">
+      <div class="table-container">
         <table>
           <thead>
             <tr>
@@ -64,7 +458,7 @@
             </tr>
           </thead>
           <tbody id="rows">
-            <tr><td colspan="5" style="opacity:.7;">Loading…</td></tr>
+            <tr><td colspan="5" class="empty-state loading">Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -98,10 +492,12 @@
           <td>${vendor}</td>
           <td>${marketer}</td>
           <td>${cat}</td>
-          <td class="mono">${entryId}</td>
+          <td><span class="mono">${entryId}</span></td>
           <td class="right">
-            <button class="btn btn-view viewBtn" data-id="${entryId}">View</button>
-            <button class="btn btn-danger delBtn" data-id="${entryId}">Delete</button>
+            <div class="actions-cell">
+              <button class="btn btn-view viewBtn" data-id="${entryId}">View</button>
+              <button class="btn btn-danger delBtn" data-id="${entryId}">Delete</button>
+            </div>
           </td>
         </tr>
       `;
@@ -110,7 +506,7 @@
     function render(rows) {
       const tbody = document.getElementById('rows');
       if (!rows.length) {
-        tbody.innerHTML = `<tr><td colspan="5" style="opacity:.7;">No entries.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No entries found.</td></tr>`;
         document.getElementById('countSub').textContent = '0 entries';
         return;
       }
@@ -163,7 +559,7 @@
     async function load() {
       const out = await api('list');
       if (!out.ok) {
-        document.getElementById('rows').innerHTML = `<tr><td colspan="5">Error: ${out.error}</td></tr>`;
+        document.getElementById('rows').innerHTML = `<tr><td colspan="5" class="empty-state">Error: ${out.error}</td></tr>`;
         document.getElementById('countSub').textContent = 'Error';
         return;
       }
