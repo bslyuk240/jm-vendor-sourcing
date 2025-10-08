@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jm-vendor-v6';
+const CACHE_NAME = 'jm-vendor-v7';
 const URLS_TO_CACHE = ['/', '/index.html', '/recent.html'];
 
 self.addEventListener('install', (event) => {
@@ -15,7 +15,32 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then(resp => resp || fetch(event.request))
-  );
+  const url = new URL(event.request.url);
+  
+  // Use network-first strategy for HTML pages to ensure fresh content
+  if (event.request.method === 'GET' && 
+      (url.pathname === '/' || url.pathname.endsWith('.html'))) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // If we got a valid response, cache it and return
+          if (response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, responseClone);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // Network failed, try cache as fallback
+          return caches.match(event.request);
+        })
+    );
+  } else {
+    // For other resources, use cache-first strategy
+    event.respondWith(
+      caches.match(event.request).then(resp => resp || fetch(event.request))
+    );
+  }
 });
