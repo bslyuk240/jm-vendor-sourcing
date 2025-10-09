@@ -209,6 +209,12 @@
       position: relative;
     }
     
+    .desktop-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    
     /* Card */
     .card { 
       background: var(--card); 
@@ -562,6 +568,9 @@
       nav {
         display: none;
       }
+      .desktop-actions {
+        display: none;
+      }
       .menu-btn {
         display: flex;
       }
@@ -623,8 +632,12 @@
         <nav>
           <a href="./index.html">New Entry</a>
           <a href="./recent.html" class="active">Recent Entries</a>
-          <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
         </nav>
+        
+        <!-- Desktop Settings Button -->
+        <div class="desktop-actions">
+          <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
+        </div>
         
         <!-- Mobile Navigation -->
         <div class="nav-actions">
@@ -691,6 +704,7 @@
     <div class="pdf-toolbar">
       <h2 style="margin: 0; color: var(--purple-dark);">Vendor Entry Report</h2>
       <div style="display: flex; gap: 1rem; align-items: center;">
+        <button class="btn btn-primary" id="downloadBtn">Download PDF</button>
         <button class="btn btn-view" id="printBtn">Print</button>
         <button class="btn btn-secondary" id="closePdfBtn">Close</button>
       </div>
@@ -723,9 +737,8 @@
       const marketer = r.marketer_name || '';
       const cat = r.category || '';
       
-      // Detect mobile for button text
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const buttonText = isMobile ? 'Download PDF' : 'View PDF';
+      // Button text is now consistent for all devices since we show preview first
+      const buttonText = 'View PDF';
       
       return `
         <tr data-entry-id="${entryId}">
@@ -865,38 +878,15 @@
             doc.text(`Page ${i} of ${pageCount}`, 180, 287);
           }
           
-          // Detect Android and use appropriate PDF display method
-          const isAndroid = /Android/i.test(navigator.userAgent);
-          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          // Always show PDF preview first, regardless of device
+          const pdfData = doc.output('blob');
+          const blobUrl = URL.createObjectURL(pdfData);
+          document.getElementById('pdfFrame').src = blobUrl;
+          document.getElementById('pdfViewer').style.display = 'flex';
           
-          if (isAndroid || (isMobile && !window.chrome)) {
-            // For Android and problematic mobile browsers, directly download the PDF
-            const filename = `vendor-report-${rec.vendor_name?.replace(/[^a-zA-Z0-9]/g, '_') || 'unknown'}.pdf`;
-            doc.save(filename);
-            
-            // Show a user-friendly message
-            const msg = document.createElement('div');
-            msg.style.cssText = `
-              position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-              background: var(--card); padding: 2rem; border-radius: var(--radius-lg);
-              box-shadow: 0 20px 60px var(--shadow-lg); z-index: 3000;
-              text-align: center; max-width: 90%; color: var(--text-primary);
-            `;
-            msg.innerHTML = `
-              <h3 style="color: var(--purple-dark); margin-bottom: 1rem;">PDF Downloaded</h3>
-              <p style="margin-bottom: 1.5rem;">The vendor report has been downloaded to your device. Check your downloads folder to open it.</p>
-              <button onclick="this.parentElement.remove()" style="padding: 0.75rem 1.5rem; background: var(--purple); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer;">Got it</button>
-            `;
-            document.body.appendChild(msg);
-            
-            // Auto-remove message after 5 seconds
-            setTimeout(() => msg.remove(), 5000);
-          } else {
-            // For desktop and compatible browsers, use the iframe method
-            const blobUrl = doc.output("bloburl");
-            document.getElementById('pdfFrame').src = blobUrl;
-            document.getElementById('pdfViewer').style.display = 'flex';
-          }
+          // Store PDF data for download
+          window.currentPdfDoc = doc;
+          window.currentPdfFilename = `vendor-report-${rec.vendor_name?.replace(/[^a-zA-Z0-9]/g, '_') || 'unknown'}.pdf`;
         });
       });
     }
@@ -964,6 +954,7 @@
     const pdfViewer = document.getElementById('pdfViewer');
     const closePdfBtn = document.getElementById('closePdfBtn');
     const printBtn = document.getElementById('printBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
     
     function openSettings() {
       settingsModal.style.display = 'block';
@@ -1010,6 +1001,12 @@
     
     closePdfBtn.addEventListener('click', () => {
       pdfViewer.style.display = 'none';
+    });
+    
+    downloadBtn.addEventListener('click', () => {
+      if (window.currentPdfDoc && window.currentPdfFilename) {
+        window.currentPdfDoc.save(window.currentPdfFilename);
+      }
     });
     
     printBtn.addEventListener('click', () => {
