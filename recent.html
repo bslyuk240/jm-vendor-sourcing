@@ -69,6 +69,42 @@
       flex-wrap: wrap;
     }
     
+    .brand-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .settings-btn {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--white);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+    }
+    
+    .settings-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+    
     .brand { 
       color: var(--white);
       font-weight: 700; 
@@ -208,14 +244,14 @@
     }
     
     .btn-view { 
-      background: var(--orange); 
+      background: #4CAF50; 
       color: var(--white);
       padding: 0.625rem 1.25rem;
       font-size: 0.85rem;
     }
     
     .btn-view:hover {
-      background: var(--orange-light);
+      background: #45a049;
       transform: translateY(-1px);
     }
     
@@ -309,11 +345,110 @@
       color: var(--text-muted);
     }
     
+    /* Settings Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+    
+    .modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      width: 90%;
+      max-width: 480px;
+      box-shadow: 0 20px 60px var(--shadow-lg);
+    }
+    
+    .modal h2 {
+      color: var(--purple-dark);
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+    }
+    
+    .btn-green {
+      background: #4CAF50;
+      color: var(--white);
+      border: 0;
+      padding: 0.875rem 1.5rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+    
+    .btn-green:hover {
+      background: #45a049;
+      transform: translateY(-1px);
+    }
+    
+    /* PDF Viewer */
+    .pdf-viewer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      z-index: 2000;
+      display: none;
+      flex-direction: column;
+    }
+    
+    .pdf-toolbar {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    
+    .pdf-content {
+      flex: 1;
+      overflow: auto;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    
+    .pdf-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 4px 20px var(--shadow);
+      background: var(--white);
+    }
+    
     /* Responsive */
     @media (max-width: 968px) { 
       .container { padding: 1rem; }
-      header { padding: 1.5rem; }
-      .header-content { flex-direction: column; }
+      header { padding: 1rem; }
+      .header-content { flex-direction: column; gap: 1rem; }
+      .brand-container { justify-content: space-between; width: 100%; }
+      nav { order: 2; width: 100%; }
       .card { padding: 1.5rem; }
       .toolbar { flex-direction: column; align-items: stretch; }
       .toolbar-actions { justify-content: stretch; flex-direction: column; }
@@ -322,6 +457,10 @@
       th, td { padding: 0.75rem 0.5rem; font-size: 0.85rem; }
       .actions-cell { flex-direction: column; gap: 0.375rem; }
       .btn-view, .btn-delete { width: 100%; padding: 0.5rem 1rem; }
+      .modal-content { width: 95%; padding: 1.5rem; }
+      .modal-actions { flex-direction: column; }
+      .logo { width: 32px; height: 32px; }
+      .settings-btn { width: 32px; height: 32px; font-size: 1rem; }
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -330,9 +469,13 @@
   <div class="container">
     <header>
       <div class="header-content">
-        <div>
-          <div class="brand">JulineMart</div>
-          <div class="brand-subtitle">Vendor Sourcing Platform</div>
+        <div class="brand-container">
+          <img id="logoImg" class="logo" src="" alt="Logo" style="display: none;" />
+          <div>
+            <div class="brand">JulineMart</div>
+            <div class="brand-subtitle">Vendor Sourcing Platform</div>
+          </div>
+          <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
         </div>
         <nav>
           <a href="./index.html">New Entry</a>
@@ -372,6 +515,35 @@
         </table>
       </div>
     </section>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <h2>Settings</h2>
+      <div class="form-group">
+        <label>Logo URL</label>
+        <input type="url" id="logoUrlInput" placeholder="https://example.com/logo.png" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelSettings">Cancel</button>
+        <button class="btn btn-primary" id="saveSettings">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF Viewer -->
+  <div id="pdfViewer" class="pdf-viewer">
+    <div class="pdf-toolbar">
+      <h2 style="margin: 0; color: var(--purple-dark);">Vendor Entry Report</h2>
+      <div style="display: flex; gap: 1rem; align-items: center;">
+        <button class="btn btn-green" id="printBtn">Print</button>
+        <button class="btn btn-secondary" id="closePdfBtn">Close</button>
+      </div>
+    </div>
+    <div class="pdf-content">
+      <iframe id="pdfFrame" class="pdf-iframe"></iframe>
+    </div>
   </div>
 
   <script>
@@ -445,7 +617,7 @@
         });
       });
 
-      // View PDF functionality
+      // View PDF functionality - now opens in same page
       document.querySelectorAll('.viewBtn').forEach(btn => {
         btn.addEventListener('click', async () => {
           const id = btn.dataset.id;
@@ -545,9 +717,10 @@
             doc.text(`Page ${i} of ${pageCount}`, 180, 287);
           }
           
-          // Open in new tab
+          // Open in same page with print button
           const blobUrl = doc.output("bloburl");
-          window.open(blobUrl, "_blank");
+          document.getElementById('pdfFrame').src = blobUrl;
+          document.getElementById('pdfViewer').style.display = 'flex';
         });
       });
     }
@@ -576,6 +749,62 @@
       render(filtered);
     });
 
+    // Settings functionality
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    const logoUrlInput = document.getElementById('logoUrlInput');
+    const logoImg = document.getElementById('logoImg');
+    const saveSettingsBtn = document.getElementById('saveSettings');
+    const cancelSettingsBtn = document.getElementById('cancelSettings');
+    const pdfViewer = document.getElementById('pdfViewer');
+    const closePdfBtn = document.getElementById('closePdfBtn');
+    const printBtn = document.getElementById('printBtn');
+    
+    // Load saved logo URL
+    const savedLogoUrl = localStorage.getItem('julinemart-logo-url');
+    if (savedLogoUrl) {
+      logoImg.src = savedLogoUrl;
+      logoImg.style.display = 'block';
+      logoUrlInput.value = savedLogoUrl;
+    }
+    
+    settingsBtn.addEventListener('click', () => {
+      settingsModal.style.display = 'block';
+    });
+    
+    cancelSettingsBtn.addEventListener('click', () => {
+      settingsModal.style.display = 'none';
+    });
+    
+    settingsModal.addEventListener('click', (e) => {
+      if (e.target === settingsModal) {
+        settingsModal.style.display = 'none';
+      }
+    });
+    
+    saveSettingsBtn.addEventListener('click', () => {
+      const logoUrl = logoUrlInput.value.trim();
+      if (logoUrl) {
+        localStorage.setItem('julinemart-logo-url', logoUrl);
+        logoImg.src = logoUrl;
+        logoImg.style.display = 'block';
+        // Show success message (you can implement toast here if needed)
+      } else {
+        localStorage.removeItem('julinemart-logo-url');
+        logoImg.style.display = 'none';
+      }
+      settingsModal.style.display = 'none';
+    });
+    
+    closePdfBtn.addEventListener('click', () => {
+      pdfViewer.style.display = 'none';
+    });
+    
+    printBtn.addEventListener('click', () => {
+      const iframe = document.getElementById('pdfFrame');
+      iframe.contentWindow.print();
+    });
+    
     document.addEventListener('DOMContentLoaded', () => {
       load();
       if ('serviceWorker' in navigator) {
