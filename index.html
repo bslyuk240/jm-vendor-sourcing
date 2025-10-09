@@ -123,6 +123,12 @@
       font-weight: 400;
     }
     
+    .desktop-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    
     nav {
       display: flex;
       gap: 0.75rem;
@@ -469,6 +475,9 @@
       .brand-subtitle {
         font-size: 0.75rem;
       }
+      .desktop-actions {
+        display: none;
+      }
       nav {
         display: none;
       }
@@ -500,7 +509,7 @@
         </div>
         
         <!-- Desktop Navigation -->
-        <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <div class="desktop-actions">
           <nav>
             <a href="./index.html" class="active">New Entry</a>
             <a href="./recent.html">Recent Entries</a>
