@@ -133,6 +133,12 @@
       padding: 0.5rem;
     }
     
+    .desktop-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    
     nav a { 
       color: var(--white); 
       text-decoration: none; 
@@ -207,12 +213,6 @@
       gap: 0.5rem;
       align-items: center;
       position: relative;
-    }
-    
-    .desktop-actions {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
     }
     
     /* Card */
@@ -568,9 +568,6 @@
       nav {
         display: none;
       }
-      .desktop-actions {
-        display: none;
-      }
       .menu-btn {
         display: flex;
       }
@@ -632,12 +629,8 @@
         <nav>
           <a href="./index.html">New Entry</a>
           <a href="./recent.html" class="active">Recent Entries</a>
-        </nav>
-        
-        <!-- Desktop Settings Button -->
-        <div class="desktop-actions">
           <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
-        </div>
+        </nav>
         
         <!-- Mobile Navigation -->
         <div class="nav-actions">
@@ -704,7 +697,6 @@
     <div class="pdf-toolbar">
       <h2 style="margin: 0; color: var(--purple-dark);">Vendor Entry Report</h2>
       <div style="display: flex; gap: 1rem; align-items: center;">
-        <button class="btn btn-primary" id="downloadBtn">Download PDF</button>
         <button class="btn btn-view" id="printBtn">Print</button>
         <button class="btn btn-secondary" id="closePdfBtn">Close</button>
       </div>
@@ -736,10 +728,6 @@
       const vendor = r.vendor_name || '';
       const marketer = r.marketer_name || '';
       const cat = r.category || '';
-      
-      // Button text is now consistent for all devices since we show preview first
-      const buttonText = 'View PDF';
-      
       return `
         <tr data-entry-id="${entryId}">
           <td><strong>${vendor}</strong></td>
@@ -748,7 +736,7 @@
           <td><span class="entry-id">${entryId.slice(0, 8)}...</span></td>
           <td>
             <div class="actions-cell">
-              <button class="btn btn-view viewBtn" data-id="${entryId}">${buttonText}</button>
+              <button class="btn btn-view viewBtn" data-id="${entryId}">View PDF</button>
               <button class="btn btn-delete delBtn" data-id="${entryId}">Delete</button>
             </div>
           </td>
@@ -878,15 +866,9 @@
             doc.text(`Page ${i} of ${pageCount}`, 180, 287);
           }
           
-          // Always show PDF preview first, regardless of device
-          const pdfData = doc.output('blob');
-          const blobUrl = URL.createObjectURL(pdfData);
+          const blobUrl = doc.output("bloburl");
           document.getElementById('pdfFrame').src = blobUrl;
           document.getElementById('pdfViewer').style.display = 'flex';
-          
-          // Store PDF data for download
-          window.currentPdfDoc = doc;
-          window.currentPdfFilename = `vendor-report-${rec.vendor_name?.replace(/[^a-zA-Z0-9]/g, '_') || 'unknown'}.pdf`;
         });
       });
     }
@@ -954,7 +936,6 @@
     const pdfViewer = document.getElementById('pdfViewer');
     const closePdfBtn = document.getElementById('closePdfBtn');
     const printBtn = document.getElementById('printBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
     
     function openSettings() {
       settingsModal.style.display = 'block';
@@ -1001,12 +982,6 @@
     
     closePdfBtn.addEventListener('click', () => {
       pdfViewer.style.display = 'none';
-    });
-    
-    downloadBtn.addEventListener('click', () => {
-      if (window.currentPdfDoc && window.currentPdfFilename) {
-        window.currentPdfDoc.save(window.currentPdfFilename);
-      }
     });
     
     printBtn.addEventListener('click', () => {
