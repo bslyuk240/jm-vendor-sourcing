@@ -122,6 +122,7 @@
     nav {
       display: flex;
       gap: 0.75rem;
+      align-items: center;
       background: rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(10px);
       border-radius: var(--radius-md);
@@ -131,10 +132,10 @@
     nav a { 
       color: var(--white); 
       text-decoration: none; 
-      padding: 0.75rem 1.5rem; 
+      padding: 0.5rem 1rem; 
       border-radius: var(--radius-sm);
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       transition: var(--transition);
     }
     
@@ -474,11 +475,11 @@
             <div class="brand">JulineMart</div>
             <div class="brand-subtitle">Vendor Sourcing Platform</div>
           </div>
-          <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
         </div>
         <nav>
           <a href="./index.html" class="active">New Entry</a>
           <a href="./recent.html">Recent Entries</a>
+          <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
         </nav>
       </div>
     </header>
@@ -697,12 +698,14 @@
     const saveSettingsBtn = document.getElementById('saveSettings');
     const cancelSettingsBtn = document.getElementById('cancelSettings');
     
-    // Load saved logo URL
-    const savedLogoUrl = localStorage.getItem('julinemart-logo-url');
-    if (savedLogoUrl) {
-      logoImg.src = savedLogoUrl;
-      logoImg.style.display = 'block';
-      logoUrlInput.value = savedLogoUrl;
+    // Load saved logo URL from server
+    async function loadSettings() {
+      const out = await api('get-settings');
+      if (out.ok && out.logoUrl) {
+        logoImg.src = out.logoUrl;
+        logoImg.style.display = 'block';
+        logoUrlInput.value = out.logoUrl;
+      }
     }
     
     settingsBtn.addEventListener('click', () => {
@@ -719,20 +722,26 @@
       }
     });
     
-    saveSettingsBtn.addEventListener('click', () => {
+    saveSettingsBtn.addEventListener('click', async () => {
       const logoUrl = logoUrlInput.value.trim();
-      if (logoUrl) {
-        localStorage.setItem('julinemart-logo-url', logoUrl);
-        logoImg.src = logoUrl;
-        logoImg.style.display = 'block';
-        showToast('✓ Logo updated successfully!', true);
+      const out = await api('save-settings', { logoUrl });
+      if (out.ok) {
+        if (logoUrl) {
+          logoImg.src = logoUrl;
+          logoImg.style.display = 'block';
+          showToast('✓ Logo updated successfully!', true);
+        } else {
+          logoImg.style.display = 'none';
+          showToast('✓ Logo removed successfully!', true);
+        }
       } else {
-        localStorage.removeItem('julinemart-logo-url');
-        logoImg.style.display = 'none';
-        showToast('✓ Logo removed successfully!', true);
+        showToast('Failed to save settings: ' + out.error, false);
       }
       settingsModal.style.display = 'none';
     });
+    
+    // Load settings on page load
+    loadSettings();
     
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/service-worker.js?v=7').catch(() => {});
