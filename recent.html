@@ -123,6 +123,12 @@
       font-weight: 400;
     }
     
+    .desktop-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    
     nav {
       display: flex;
       gap: 0.75rem;
@@ -131,12 +137,6 @@
       backdrop-filter: blur(10px);
       border-radius: var(--radius-md);
       padding: 0.5rem;
-    }
-    
-    .desktop-actions {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
     }
     
     nav a { 
@@ -435,6 +435,103 @@
       color: var(--text-muted);
     }
     
+    /* Detail Modal */
+    .detail-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      backdrop-filter: blur(4px);
+      overflow-y: auto;
+    }
+    
+    .detail-content {
+      position: relative;
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin: 2rem auto;
+      width: 90%;
+      max-width: 800px;
+      box-shadow: 0 20px 60px var(--shadow-lg);
+    }
+    
+    .detail-header {
+      background: linear-gradient(135deg, var(--purple-dark) 0%, var(--purple) 100%);
+      margin: -2rem -2rem 2rem -2rem;
+      padding: 1.5rem 2rem;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      color: var(--white);
+    }
+    
+    .detail-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    
+    .detail-header p {
+      margin: 0.5rem 0 0 0;
+      opacity: 0.9;
+      font-size: 0.9rem;
+    }
+    
+    .detail-section {
+      margin-bottom: 2rem;
+    }
+    
+    .detail-section:last-child {
+      margin-bottom: 0;
+    }
+    
+    .detail-section h3 {
+      color: var(--purple);
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+    
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+    
+    .detail-field {
+      padding: 0.75rem;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+    }
+    
+    .detail-field label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    
+    .detail-field .value {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+    
+    .detail-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    
     /* Settings Modal */
     .modal {
       display: none;
@@ -504,47 +601,6 @@
       background: var(--white);
     }
     
-    /* PDF Viewer */
-    .pdf-viewer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--bg);
-      z-index: 2000;
-      display: none;
-      flex-direction: column;
-    }
-    
-    .pdf-toolbar {
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 8px var(--shadow);
-    }
-    
-    .pdf-content {
-      flex: 1;
-      overflow: auto;
-      padding: 2rem;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-    }
-    
-    .pdf-iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      border-radius: var(--radius-sm);
-      box-shadow: 0 4px 20px var(--shadow);
-      background: var(--white);
-    }
-    
     /* Responsive */
     @media (max-width: 968px) { 
       .container { padding: 1rem; }
@@ -565,6 +621,9 @@
       .brand-subtitle {
         font-size: 0.75rem;
       }
+      .desktop-actions {
+        display: none;
+      }
       nav {
         display: none;
       }
@@ -575,6 +634,9 @@
       .toolbar { flex-direction: column; align-items: stretch; }
       .toolbar-actions { justify-content: stretch; flex-direction: column; }
       .search { width: 100%; }
+      .detail-actions { flex-direction: column; }
+      .detail-content { width: 95%; padding: 1.5rem; margin: 1rem auto; }
+      .detail-grid { grid-template-columns: 1fr; }
       
       th, td { padding: 0.75rem 0.5rem; font-size: 0.85rem; }
       .actions-cell { flex-direction: column; gap: 0.375rem; }
@@ -583,32 +645,6 @@
       .modal-actions { flex-direction: column; }
       .logo { width: 32px; height: 32px; }
       .settings-btn, .menu-btn { width: 36px; height: 36px; font-size: 1rem; }
-    }
-
-    @media print {
-      body * { visibility: hidden; }
-      .pdf-viewer, .pdf-viewer *, .pdf-iframe { visibility: visible; }
-      .pdf-viewer {
-        position: static;
-        width: 100%;
-        height: 100%;
-        background: white;
-        margin: 0;
-        padding: 0;
-      }
-      .pdf-toolbar { display: none !important; }
-      .pdf-content {
-        padding: 0;
-        margin: 0;
-        width: 100%;
-        height: 100%;
-      }
-      .pdf-iframe {
-        width: 100%;
-        height: 100vh;
-        box-shadow: none;
-        border-radius: 0;
-      }
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -626,11 +662,13 @@
         </div>
         
         <!-- Desktop Navigation -->
-        <nav>
-          <a href="./index.html">New Entry</a>
-          <a href="./recent.html" class="active">Recent Entries</a>
+        <div class="desktop-actions">
+          <nav>
+            <a href="./index.html">New Entry</a>
+            <a href="./recent.html" class="active">Recent Entries</a>
+          </nav>
           <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
-        </nav>
+        </div>
         
         <!-- Mobile Navigation -->
         <div class="nav-actions">
@@ -670,11 +708,110 @@
             </tr>
           </thead>
           <tbody id="rows">
-            <tr><td colspan="6" class="empty-state">Loading entries...</td></tr>
+            <tr><td colspan="5" class="empty-state">Loading entries...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
+  </div>
+
+  <!-- Detail Modal -->
+  <div id="detailModal" class="detail-modal">
+    <div class="detail-content">
+      <div class="detail-header">
+        <h2 id="detailTitle">Vendor Entry Details</h2>
+        <p id="detailEntryId"></p>
+      </div>
+      
+      <div class="detail-section">
+        <h3>Vendor Information</h3>
+        <div class="detail-grid">
+          <div class="detail-field">
+            <label>Business Name</label>
+            <div class="value" id="detailVendorName">—</div>
+          </div>
+          <div class="detail-field">
+            <label>Contact Person</label>
+            <div class="value" id="detailContactPerson">—</div>
+          </div>
+          <div class="detail-field">
+            <label>Phone</label>
+            <div class="value" id="detailVendorPhone">—</div>
+          </div>
+          <div class="detail-field">
+            <label>Email</label>
+            <div class="value" id="detailVendorEmail">—</div>
+          </div>
+          <div class="detail-field">
+            <label>Address</label>
+            <div class="value" id="detailBusinessAddress">—</div>
+          </div>
+          <div class="detail-field">
+            <label>Category</label>
+            <div class="value" id="detailCategory">—</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <h3>Marketer Information</h3>
+        <div class="detail-grid">
+          <div class="detail-field">
+            <label>Name</label>
+            <div class="value" id="detailMarketerName">—</div>
+          </div>
+          <div class="detail-field">
+            <label>Phone</label>
+            <div class="value" id="detailMarketerPhone">—</div>
+          </div>
+          <div class="detail-field">
+            <label>Email</label>
+            <div class="value" id="detailMarketerEmail">—</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <h3>Business Details</h3>
+        <div class="detail-grid">
+          <div class="detail-field">
+            <label>Sells Online</label>
+            <div class="value" id="detailSellsOnline">—</div>
+          </div>
+          <div class="detail-field">
+            <label>Online Platforms</label>
+            <div class="value" id="detailWhereOnline">—</div>
+          </div>
+          <div class="detail-field">
+            <label>Interest Level</label>
+            <div class="value" id="detailInterest">—</div>
+          </div>
+          <div class="detail-field">
+            <label>Onboarding Type</label>
+            <div class="value" id="detailOnboarding">—</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="detail-section" id="additionalSection" style="display: none;">
+        <h3>Additional Information</h3>
+        <div class="detail-grid">
+          <div class="detail-field" id="challengesField" style="display: none; grid-column: 1 / -1;">
+            <label>Challenges</label>
+            <div class="value" id="detailChallenges">—</div>
+          </div>
+          <div class="detail-field" id="commentsField" style="display: none; grid-column: 1 / -1;">
+            <label>Comments</label>
+            <div class="value" id="detailComments">—</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="detail-actions">
+        <button class="btn btn-view" id="downloadPdfBtn">Download PDF</button>
+        <button class="btn btn-secondary" id="closeDetailBtn">Close</button>
+      </div>
+    </div>
   </div>
 
   <!-- Settings Modal -->
@@ -689,20 +826,6 @@
         <button class="btn btn-secondary" id="cancelSettings">Cancel</button>
         <button class="btn btn-primary" id="saveSettings">Save</button>
       </div>
-    </div>
-  </div>
-
-  <!-- PDF Viewer -->
-  <div id="pdfViewer" class="pdf-viewer">
-    <div class="pdf-toolbar">
-      <h2 style="margin: 0; color: var(--purple-dark);">Vendor Entry Report</h2>
-      <div style="display: flex; gap: 1rem; align-items: center;">
-        <button class="btn btn-view" id="printBtn">Print</button>
-        <button class="btn btn-secondary" id="closePdfBtn">Close</button>
-      </div>
-    </div>
-    <div class="pdf-content">
-      <iframe id="pdfFrame" class="pdf-iframe"></iframe>
     </div>
   </div>
 
@@ -736,7 +859,7 @@
           <td><span class="entry-id">${entryId.slice(0, 8)}...</span></td>
           <td>
             <div class="actions-cell">
-              <button class="btn btn-view viewBtn" data-id="${entryId}">View PDF</button>
+              <button class="btn btn-view viewBtn" data-id="${entryId}">View Details</button>
               <button class="btn btn-delete delBtn" data-id="${entryId}">Delete</button>
             </div>
           </td>
@@ -747,7 +870,7 @@
     function render(rows) {
       const tbody = document.getElementById('rows');
       if (!rows.length) {
-        tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No entries found</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No entries found</td></tr>`;
         document.getElementById('countSub').textContent = '0 entries';
         return;
       }
@@ -782,93 +905,52 @@
           const rec = ALL_ROWS.find(r => r.entry_id === id);
           if (!rec) return alert('Record not found');
 
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF();
+          // Show detail modal
+          const detailModal = document.getElementById('detailModal');
+          document.getElementById('detailTitle').textContent = rec.vendor_name || 'Vendor Entry';
+          document.getElementById('detailEntryId').textContent = `Entry ID: ${rec.entry_id}`;
           
-          doc.setFillColor(94, 0, 99);
-          doc.rect(0, 0, 210, 40, 'F');
+          // Vendor info
+          document.getElementById('detailVendorName').textContent = rec.vendor_name || '—';
+          document.getElementById('detailContactPerson').textContent = rec.contact_person || '—';
+          document.getElementById('detailVendorPhone').textContent = rec.vendor_phone || '—';
+          document.getElementById('detailVendorEmail').textContent = rec.vendor_email || '—';
+          document.getElementById('detailBusinessAddress').textContent = rec.business_address || '—';
+          document.getElementById('detailCategory').textContent = rec.category || '—';
           
-          doc.setTextColor(255, 255, 255);
-          doc.setFontSize(24);
-          doc.setFont(undefined, 'bold');
-          doc.text('JulineMart', 14, 18);
+          // Marketer info
+          document.getElementById('detailMarketerName').textContent = rec.marketer_name || '—';
+          document.getElementById('detailMarketerPhone').textContent = rec.marketer_phone || '—';
+          document.getElementById('detailMarketerEmail').textContent = rec.marketer_email || '—';
           
-          doc.setFontSize(11);
-          doc.setFont(undefined, 'normal');
-          doc.text('Vendor Entry Report', 14, 26);
+          // Business details
+          document.getElementById('detailSellsOnline').textContent = rec.sells_online || '—';
+          document.getElementById('detailWhereOnline').textContent = rec.where_online || '—';
+          document.getElementById('detailInterest').textContent = rec.interest || '—';
+          document.getElementById('detailOnboarding').textContent = rec.onboarding || '—';
           
-          doc.setTextColor(26, 26, 26);
+          // Additional info
+          const hasAdditional = rec.challenges || rec.comments;
+          document.getElementById('additionalSection').style.display = hasAdditional ? 'block' : 'none';
           
-          let y = 50;
-          
-          const addSection = (title, fields) => {
-            doc.setFontSize(14);
-            doc.setFont(undefined, 'bold');
-            doc.setTextColor(94, 0, 99);
-            doc.text(title, 14, y);
-            y += 8;
-            
-            doc.setFontSize(10);
-            doc.setFont(undefined, 'normal');
-            doc.setTextColor(26, 26, 26);
-            
-            fields.forEach(([label, value]) => {
-              if (value) {
-                doc.setFont(undefined, 'bold');
-                doc.text(label + ':', 14, y);
-                doc.setFont(undefined, 'normal');
-                doc.text(String(value), 60, y);
-                y += 6;
-              }
-            });
-            
-            y += 4;
-          };
-          
-          addSection('Vendor Information', [
-            ['Business Name', rec.vendor_name],
-            ['Contact Person', rec.contact_person],
-            ['Phone', rec.vendor_phone],
-            ['Email', rec.vendor_email],
-            ['Address', rec.business_address],
-            ['Category', rec.category]
-          ]);
-          
-          if (y > 240) { doc.addPage(); y = 20; }
-          addSection('Marketer Information', [
-            ['Name', rec.marketer_name],
-            ['Phone', rec.marketer_phone],
-            ['Email', rec.marketer_email]
-          ]);
-          
-          if (y > 240) { doc.addPage(); y = 20; }
-          addSection('Business Details', [
-            ['Sells Online', rec.sells_online],
-            ['Online Platforms', rec.where_online],
-            ['Interest Level', rec.interest],
-            ['Onboarding Type', rec.onboarding]
-          ]);
-          
-          if (rec.challenges || rec.comments) {
-            if (y > 240) { doc.addPage(); y = 20; }
-            addSection('Additional Information', [
-              ['Challenges', rec.challenges],
-              ['Comments', rec.comments]
-            ]);
+          if (rec.challenges) {
+            document.getElementById('challengesField').style.display = 'block';
+            document.getElementById('detailChallenges').textContent = rec.challenges;
+          } else {
+            document.getElementById('challengesField').style.display = 'none';
           }
           
-          const pageCount = doc.internal.getNumberOfPages();
-          for (let i = 1; i <= pageCount; i++) {
-            doc.setPage(i);
-            doc.setFontSize(8);
-            doc.setTextColor(153, 153, 153);
-            doc.text(`Entry ID: ${rec.entry_id}`, 14, 287);
-            doc.text(`Page ${i} of ${pageCount}`, 180, 287);
+          if (rec.comments) {
+            document.getElementById('commentsField').style.display = 'block';
+            document.getElementById('detailComments').textContent = rec.comments;
+          } else {
+            document.getElementById('commentsField').style.display = 'none';
           }
           
-          const blobUrl = doc.output("bloburl");
-          document.getElementById('pdfFrame').src = blobUrl;
-          document.getElementById('pdfViewer').style.display = 'flex';
+          // Store current record for PDF download
+          detailModal.dataset.currentRecord = JSON.stringify(rec);
+          
+          detailModal.style.display = 'block';
         });
       });
     }
@@ -876,7 +958,7 @@
     async function load() {
       const out = await api('list');
       if (!out.ok) {
-        document.getElementById('rows').innerHTML = `<tr><td colspan="6" class="empty-state">Error: ${out.error}</td></tr>`;
+        document.getElementById('rows').innerHTML = `<tr><td colspan="5" class="empty-state">Error: ${out.error}</td></tr>`;
         document.getElementById('countSub').textContent = 'Error loading entries';
         return;
       }
@@ -933,9 +1015,9 @@
     const logoImg = document.getElementById('logoImg');
     const saveSettingsBtn = document.getElementById('saveSettings');
     const cancelSettingsBtn = document.getElementById('cancelSettings');
-    const pdfViewer = document.getElementById('pdfViewer');
-    const closePdfBtn = document.getElementById('closePdfBtn');
-    const printBtn = document.getElementById('printBtn');
+    const detailModal = document.getElementById('detailModal');
+    const closeDetailBtn = document.getElementById('closeDetailBtn');
+    const downloadPdfBtn = document.getElementById('downloadPdfBtn');
     
     function openSettings() {
       settingsModal.style.display = 'block';
@@ -980,21 +1062,111 @@
     
     loadSettings();
     
-    closePdfBtn.addEventListener('click', () => {
-      pdfViewer.style.display = 'none';
+    closeDetailBtn.addEventListener('click', () => {
+      detailModal.style.display = 'none';
     });
     
-    printBtn.addEventListener('click', () => {
-      const iframe = document.getElementById('pdfFrame');
+    detailModal.addEventListener('click', (e) => {
+      if (e.target === detailModal) {
+        detailModal.style.display = 'none';
+      }
+    });
+    
+    downloadPdfBtn.addEventListener('click', () => {
+      const recData = detailModal.dataset.currentRecord;
+      if (!recData) return;
       
-      setTimeout(() => {
-        if (iframe.contentWindow) {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
-        } else {
-          window.print();
-        }
-      }, 500);
+      const rec = JSON.parse(recData);
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      doc.setFillColor(94, 0, 99);
+      doc.rect(0, 0, 210, 40, 'F');
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(24);
+      doc.setFont(undefined, 'bold');
+      doc.text('JulineMart', 14, 18);
+      
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'normal');
+      doc.text('Vendor Entry Report', 14, 26);
+      
+      doc.setTextColor(26, 26, 26);
+      
+      let y = 50;
+      
+      const addSection = (title, fields) => {
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(94, 0, 99);
+        doc.text(title, 14, y);
+        y += 8;
+        
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(26, 26, 26);
+        
+        fields.forEach(([label, value]) => {
+          if (value) {
+            doc.setFont(undefined, 'bold');
+            doc.text(label + ':', 14, y);
+            doc.setFont(undefined, 'normal');
+            const textValue = String(value);
+            const maxWidth = 130;
+            const lines = doc.splitTextToSize(textValue, maxWidth);
+            doc.text(lines, 60, y);
+            y += (lines.length * 6);
+          }
+        });
+        
+        y += 4;
+      };
+      
+      addSection('Vendor Information', [
+        ['Business Name', rec.vendor_name],
+        ['Contact Person', rec.contact_person],
+        ['Phone', rec.vendor_phone],
+        ['Email', rec.vendor_email],
+        ['Address', rec.business_address],
+        ['Category', rec.category]
+      ]);
+      
+      if (y > 240) { doc.addPage(); y = 20; }
+      addSection('Marketer Information', [
+        ['Name', rec.marketer_name],
+        ['Phone', rec.marketer_phone],
+        ['Email', rec.marketer_email]
+      ]);
+      
+      if (y > 240) { doc.addPage(); y = 20; }
+      addSection('Business Details', [
+        ['Sells Online', rec.sells_online],
+        ['Online Platforms', rec.where_online],
+        ['Interest Level', rec.interest],
+        ['Onboarding Type', rec.onboarding]
+      ]);
+      
+      if (rec.challenges || rec.comments) {
+        if (y > 240) { doc.addPage(); y = 20; }
+        addSection('Additional Information', [
+          ['Challenges', rec.challenges],
+          ['Comments', rec.comments]
+        ]);
+      }
+      
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(153, 153, 153);
+        doc.text(`Entry ID: ${rec.entry_id}`, 14, 287);
+        doc.text(`Page ${i} of ${pageCount}`, 180, 287);
+      }
+      
+      // Download the PDF
+      const fileName = `${rec.vendor_name || 'vendor'}_${rec.entry_id.slice(0, 8)}.pdf`;
+      doc.save(fileName);
     });
     
     document.addEventListener('DOMContentLoaded', () => {
