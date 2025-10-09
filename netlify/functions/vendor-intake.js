@@ -69,6 +69,41 @@ export async function handler(event) {
       return json(200, { ok:true, rows:data });
     }
 
+    if (action === 'get-settings') {
+      // Get the settings - we'll store a single row with id = 'main'
+      const { data, error } = await supabase
+        .from('app_settings')
+        .select('*')
+        .eq('id', 'main')
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+        return json(500, { ok: false, error: error.message });
+      }
+
+      return json(200, { 
+        ok: true, 
+        logoUrl: data?.logo_url || null 
+      });
+    }
+
+    if (action === 'save-settings') {
+      const logoUrl = body.logoUrl || null;
+
+      // Upsert the settings
+      const { data, error } = await supabase
+        .from('app_settings')
+        .upsert({ 
+          id: 'main', 
+          logo_url: logoUrl,
+          updated_at: new Date().toISOString()
+        })
+        .select();
+
+      if (error) return json(500, { ok: false, error: error.message });
+      return json(200, { ok: true, saved: true, logoUrl });
+    }
+
     return json(400, { ok:false, error:'unknown action' });
   } catch (err) {
     return json(500, { ok:false, error: err?.message || String(err) });
